@@ -11,14 +11,16 @@ import sys, getopt
 import glob
 
 def Usage():
-    print('Usage: python searchlalo.py -Rlon1/lon2/lat1/lat2 -Dlat/lon/dis1/dis2 -K')
+    print('Usage: python searchlalo.py -Rlon1/lon2/lat1/lat2 -Dlon/lat/dis1/dis2 -Yyear1/mon1/day1/year2/mon2/day2 -Cchannel -K')
     print('-R   -- Search range.')
     print('-D   -- Search by distance.')
+    print('-Y   -- Date range')
+    print('-C   -- Channel (e.g., BHZ)')
     print('-K   -- Output Google Earth kml file.')
     
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:], "hR:D:KO:")
+    opts,args = getopt.getopt(sys.argv[1:], "hR:D:KO:Y:C:")
 except:
     print('arguments are not found!')
     Usage()
@@ -26,6 +28,8 @@ except:
 
 iskml = 0
 islalo = 0
+isyrange = 0
+ischan = 0
 for op, value in opts:
     if op == "-R":
         lat_lon = value
@@ -34,6 +38,12 @@ for op, value in opts:
         iskml = 1
     elif op == "-D":
         lat_lon = value
+    elif op == "-Y":
+        yrange = value
+        isyrange = 1
+    elif op == "-C":
+        chan = value
+        ischan = 1
     elif op == "-h":
         Usage()
         sys.exit(1)
@@ -63,7 +73,23 @@ else:
     lat2 = str(90)
     lalo = lon+'_'+lat+'_'+lat_lon_split[2]
    
-url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2
+if isyrange:
+    yrange_sp = yrange.split("/")
+    year1 = yrange_sp[0]
+    mon1 = yrange_sp[1]
+    day1 = yrange_sp[2]
+    year2 = yrange_sp[3]
+    mon2 = yrange_sp[4]
+    day2 = yrange_sp[5]
+    if ischan:
+        url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2+'&timewindow='+year1+'/'+mon1+'/'+day1+'-'+year2+'/'+mon2+'/'+day2+'&chan='+chan
+    else:
+         url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2+'&timewindow='+year1+'/'+mon1+'/'+day1+'-'+year2+'/'+mon2+'/'+day2
+elif ischan:
+    url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2+'&chan='+chan
+else:
+    url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2
+    
 response = rq.urlopen(url)
 html = str(response.read())
 find_re = re.compile(r'<station\s.+?"\s/>',re.DOTALL)

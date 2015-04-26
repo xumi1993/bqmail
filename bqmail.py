@@ -28,7 +28,7 @@ except:
 try:
     opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:")
 except:
-    print('arguments are not found!')
+    print('Arguments are not found!')
     Usage()
     sys.exit(1)
 
@@ -60,7 +60,7 @@ for o in sys.argv[1:]:
         head = o
         break
 if head == []:
-    print("Aruments or head file are not exist!")
+    print("Arguments or head file are not exist!")
     Usage()
     sys.exit(1)
 if isyrange:

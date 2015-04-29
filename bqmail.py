@@ -168,7 +168,6 @@ else:
     for row in event:
         msg += station+' '+network+' '+row[0]+' '+row[1]+' '+row[2]+' '+row[3]+' '+row[4]+' '+row[5]+' '+row[6]+' '+row[7]+' '+row[8]+' '+row[9]+' '+row[10]+' '+row[11]+' 1 BH?\n'
 
-#print(msg)
 smtp = SMTP(host=hosts, port=port)
 smtp.set_debuglevel(0)
 smtp.login(EMAIL, passwd)

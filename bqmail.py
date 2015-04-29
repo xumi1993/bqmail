@@ -11,13 +11,13 @@
 
 def Usage():
     print('Usage:')
-    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end -Cdatetimefile -s head.cfg')
+    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end -Cdatetimefile -shour head.cfg')
     print('-N   -- Network.')
     print('-S   -- Station.')
     print('-Y   -- Date range.')
     print('-B   -- Time fefore/after origal time of events in seconds.')
-    print('-C   -- Directory date time file. formaat:2015,01,04,1,0,0 2015,01,04,10,0,0')
-    print('-s   -- Dequest continuous wave by one day.')
+    print('-C   -- Directory of date time file. formaat: "2015,01,04,1,0,0 2015,01,04,10,0,0"')
+    print('-s   -- Dequest continuous wave by hour.')
     print('head.cfg   -- Config file.')
 
 
@@ -34,7 +34,7 @@ except:
 
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:s")
+    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:s:")
 except:
     print('Arguments are not found!')
     Usage()
@@ -62,6 +62,7 @@ for op, value in opts:
         timerange = value
     elif op == "-s":
         iscontinue = 1
+        timeval = float(value)
     elif op == "-h":
         Usage()
         sys.exit(1)
@@ -112,16 +113,16 @@ if iscustom:
     EVENT = open(datetimefile,'r')
     for evenum in EVENT:
         evenum = evenum.strip('\n')
-        evenum_sp = re.split(',|\s',evenum)
+        evenum_sp = re.split('\W|\s',evenum)
         event.append(evenum_sp)
         
 elif iscontinue:
-    nowtime = datemin - datetime.timedelta(days=1)
+    nowtime = datemin - datetime.timedelta(hours=timeval)
     while 1:
         if nowtime >= datemax:
             break
-        nowtime = nowtime + datetime.timedelta(days=1)
-        endtime = nowtime + datetime.timedelta(days=1)
+        nowtime = nowtime + datetime.timedelta(hours=timeval)
+        endtime = nowtime + datetime.timedelta(hours=timeval)
         event.append([nowtime.strftime('%Y'),nowtime.strftime('%m'),nowtime.strftime('%d'),nowtime.strftime('%H'),nowtime.strftime('%M'),endtime.strftime('%Y'),endtime.strftime('%m'),endtime.strftime('%d'),endtime.strftime('%H'),endtime.strftime('%M')])
 
 else:

@@ -21,8 +21,8 @@ import glob
 
 def Usage():
     print('Usage: python searchlalo.py -NNetwork -Sstation -Rlon1/lon2/lat1/lat2 -Dlon/lat/dis1/dis2 -Yyear1/mon1/day1/year2/mon2/day2 -Cchannel -K')
-    print('-N   -- Network')
-    print('-S   -- Station')
+    print('-N   -- Network.')
+    print('-S   -- Station.')
     print('-R   -- Search range.')
     print('-D   -- Search by distance.')
     print('-Y   -- Date range')
@@ -87,10 +87,6 @@ if lat_lon != '':
         lat = lat_lon_split[1]
         dis1 = float(lat_lon_split[2])
         dis2 = float(lat_lon_split[3])
-#    print(lon,lat,dis)
-#    [lat1,lon1] = distaz.latlon_from(float(lat),float(lon),225,dis*math.sqrt(2))
-#    [lat2,lon2] = distaz.latlon_from(float(lat),float(lon),45,dis*math.sqrt(2))
-#    print(lon1,lon2,lat1,lat2)
         lon1 = str(0)
         lat1 = str(-90)
         lon2 = str(0)
@@ -111,15 +107,6 @@ if isyrange:
 url += network+station+lalo_label+yrange+chan
 url = url[0:-1]
 
-#    if ischan:
-#        url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2+'&timewindow='+year1+'/'+mon1+'/'+day1+'-'+year2+'/'+mon2+'/'+day2+'&chan='+chan
-#    else:
-#        url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2+'&timewindow='+year1+'/'+mon1+'/'+day1+'-'+year2+'/'+mon2+'/'+day2
-#elif ischan:
-#    url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2+'&chan='+chan
-#else:
-#    url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2
-    
 response = rq.urlopen(url)
 html = str(response.read())
 find_re = re.compile(r'<station\s.+?"\s/>',re.DOTALL)

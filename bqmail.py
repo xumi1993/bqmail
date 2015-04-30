@@ -11,12 +11,13 @@
 
 def Usage():
     print('Usage:')
-    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end -Cdatetimefile -shour head.cfg')
+    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end -Cchannel -cdatetimefile -shour head.cfg')
     print('-N   -- Network.')
     print('-S   -- Station.')
     print('-Y   -- Date range.')
     print('-B   -- Time fefore/after origal time of events in seconds.')
-    print('-C   -- Directory of date time file. formaat: "2015,01,04,1,0,0 2015,01,04,10,0,0"')
+    print('-C   -- Channel (e.g., ?H?, HHZ, BH?). Default: BH?')
+    print('-c   -- Directory of date time file. formaat: "2015,01,04,1,0,0 2015,01,04,10,0,0"')
     print('-s   -- Dequest continuous wave by hour.')
     print('head.cfg   -- Config file.')
 
@@ -34,7 +35,7 @@ except:
 
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:s:")
+    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:s:c:")
 except:
     print('Arguments are not found!')
     Usage()
@@ -47,6 +48,7 @@ if opts == []:
 iscustom = 0
 isyrange = 0
 iscontinue = 0
+chan = "BH?"
 for op, value in opts:
     if op == "-N":
         network = value
@@ -55,7 +57,7 @@ for op, value in opts:
     elif op == "-Y":
         yrange = value
         isyrange = 1
-    elif op == "-C":
+    elif op == "-c":
         datetimefile = value
         iscustom = 1
     elif op == "-B":
@@ -63,6 +65,8 @@ for op, value in opts:
     elif op == "-s":
         iscontinue = 1
         timeval = float(value)
+    elif op == "-C":
+        chan = value
     elif op == "-h":
         Usage()
         sys.exit(1)
@@ -164,10 +168,10 @@ msg += '.LABEL '+LABEL+'\n'
 msg += '.END\n'
 if not iscustom:
     for row in event:
-       msg += station+' '+network+' '+row[0]+' '+row[1]+' '+row[2]+' '+row[3]+' '+row[4]+' 00.0 '+row[5]+' '+row[6]+' '+row[7]+' '+row[8]+' '+row[9]+' 00.0 1 BH?\n'
+       msg += station+' '+network+' '+row[0]+' '+row[1]+' '+row[2]+' '+row[3]+' '+row[4]+' 00.0 '+row[5]+' '+row[6]+' '+row[7]+' '+row[8]+' '+row[9]+' 00.0 1 '+chan+'\n'
 else:
     for row in event:
-        msg += station+' '+network+' '+row[0]+' '+row[1]+' '+row[2]+' '+row[3]+' '+row[4]+' '+row[5]+' '+row[6]+' '+row[7]+' '+row[8]+' '+row[9]+' '+row[10]+' '+row[11]+' 1 BH?\n'
+        msg += station+' '+network+' '+row[0]+' '+row[1]+' '+row[2]+' '+row[3]+' '+row[4]+' '+row[5]+' '+row[6]+' '+row[7]+' '+row[8]+' '+row[9]+' '+row[10]+' '+row[11]+' 1 '+chan+'\n'
 
 smtp = SMTP(host=hosts, port=port)
 smtp.set_debuglevel(0)

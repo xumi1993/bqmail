@@ -92,6 +92,7 @@ if lat_lon != '':
         lon2 = str(0)
         lat2 = str(90)
         lalo = lon+'_'+lat+'_'+lat_lon_split[2]
+        lalo_label = 'minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2+'&'
 
 url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?'
 if isyrange:

@@ -7,19 +7,23 @@
 #   2015/01/05
 #   2015/02/11
 #   2015/04/29
+#   2015/05/01
 #
 
 def Usage():
     print('Usage:')
-    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end -Cchannel -cdatetimefile -shour head.cfg')
+    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end -Cchannel -cdatetimefile -shour -Fformat head.cfg')
     print('-N   -- Network.')
     print('-S   -- Station.')
     print('-Y   -- Date range.')
     print('-B   -- Time fefore/after origal time of events in seconds.')
     print('-C   -- Channel (e.g., ?H?, HHZ, BH?). Default: BH?')
     print('-c   -- Directory of date time file. formaat: "2015,01,04,1,0,0 2015,01,04,10,0,0"')
-    print('-s   -- Dequest continuous wave by hour.')
+    print('-s   -- Request continuous wave by hour.')
+    print('-F   -- File format (SEED or miniseed). Default: SEED')
     print('head.cfg   -- Config file.')
+    print('Example: ./bqmail.py -NCB -SNJ2 -Y2015/2/3/1015/4/3 -B0/1000 head.cfg')
+    print('         ./bqmail.py -NCB -SNJ2 -Y2015/2/3/1015/4/3 -s1 -Fminiseed head.cfg')
 
 
 import datetime
@@ -35,7 +39,7 @@ except:
 
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:s:c:")
+    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:s:c:F:")
 except:
     print('Arguments are not found!')
     Usage()
@@ -49,6 +53,7 @@ iscustom = 0
 isyrange = 0
 iscontinue = 0
 chan = "BH?"
+fformat = "seed"
 for op, value in opts:
     if op == "-N":
         network = value
@@ -67,6 +72,8 @@ for op, value in opts:
         timeval = float(value)
     elif op == "-C":
         chan = value
+    elif op == "-F":
+        fformat = value
     elif op == "-h":
         Usage()
         sys.exit(1)
@@ -176,7 +183,13 @@ else:
 smtp = SMTP(host=hosts, port=port)
 smtp.set_debuglevel(0)
 smtp.login(EMAIL, passwd)
-smtp.sendmail(EMAIL, 'breq_fast@iris.washington.edu', msg)
+if fformat.lower() == 'seed':
+    smtp.sendmail(EMAIL, 'breq_fast@iris.washington.edu', msg)
+elif fformat.lower() == 'miniseed':
+    smtp.sendmail(EMAIL, 'miniseed@iris.washington.edu', msg)
+else:
+    print('Invalid file format!')
+    sys.exit(1)
 smtp.quit()
 print("Successful sending the mail of "+network+"."+station+" to IRIS DMC!!!")
 

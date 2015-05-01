@@ -1,7 +1,7 @@
 bqmail
 ===========
-This is a Python script to request waveform data of events from IRIS
+These are Python scripts to request waveform data of events from IRIS
 
-Usage:
+bqmail: send request mail of events data or continuous data to IRIS DMC.
 
-python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 head.cfg
+searchDMC: Search available stations in IRIS DMC.

@@ -22,8 +22,8 @@ def Usage():
     print('-s   -- Request continuous wave by hour.')
     print('-F   -- File format (SEED or miniseed). Default: SEED')
     print('head.cfg   -- Config file.')
-    print('Example: ./bqmail.py -NCB -SNJ2 -Y2015/2/3/1015/4/3 -B0/1000 head.cfg')
-    print('         ./bqmail.py -NCB -SNJ2 -Y2015/2/3/1015/4/3 -s1 -Fminiseed head.cfg')
+    print('Example: ./bqmail.py -NCB -SNJ2 -Y2015/2/3/2015/4/3 -B0/1000 head.cfg')
+    print('         ./bqmail.py -NCB -SNJ2 -Y2015/2/3/2015/4/3 -s1 -Fminiseed head.cfg')
 
 
 import datetime
@@ -120,6 +120,7 @@ if isyrange:
    LABEL = 'IRIS_'+str(year1)+"_"+str(year2)+"_"+network+"_"+station
 else:
    LABEL = 'IRIS_'+network+"_"+station
+   
 if iscustom:
     EVENT = open(datetimefile,'r')
     for evenum in EVENT:

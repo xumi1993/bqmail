@@ -117,7 +117,7 @@ for info in find_re.findall(html):
     sta_info = re.split('\w+="|"\s+?\w+="|"\s/>',info)
     if sta_info == []:
         continue
-    network = sta_info[1]
+    netname = sta_info[1]
     staname = sta_info[2]
     stlat = sta_info[4]
     stlon = sta_info[5]
@@ -128,16 +128,33 @@ for info in find_re.findall(html):
     if not islalo and lat_lon != '':
         delta = distaz.distaz(float(lat),float(lon),float(stlat),float(stlon))
         if dis1 < delta.delta < dis2:
-            print(network+' '+staname+' '+stlat+' '+stlon+' '+yrange1+' '+yrange2)
+            print(netname+' '+staname+' '+stlat+' '+stlon+' '+yrange1+' '+yrange2)
     else:
-        print(network+' '+staname+' '+stlat+' '+stlon+' '+yrange1+' '+yrange2)
+        print(netname+' '+staname+' '+stlat+' '+stlon+' '+yrange1+' '+yrange2)
 
 
         
 
 if iskml:
     if islalo:
+        if network != '':
+            Knetwork = network+'amp;'
+        else:
+            Knetwork = network
+        if station != '':
+            Kstation = network+'amp;'
+        else:
+            Kstation = station
+        if yrange != '':
+            Kyrange = yrange+'amp;'
+        else:
+            Kyrange = yrange
+        if chan != '':
+            Kchan = chan+'amp;'
+        else:
+            Kchan = chan
+        href = 'http://www.iris.edu/cgi-bin/kmlstationinfo?minlat='+lat1+'&amp;maxlat='+lat2+'&amp;minlon='+lon1+'&amp;maxlon='+lon2+'&amp;'+Knetwork+Kstation+Kyrange+Kchan+'kmz=1'
         google = open('Station_'+lalo+'.kml','w+')
-        google.write('<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.google.com/earth/kml/2.0"><NetworkLink><name>Selected stations</name><description>Station List</description><Link><href>http://www.iris.edu/cgi-bin/kmlstationinfo?minlat='+lat1+'&amp;maxlat='+lat2+'&amp;minlon='+lon1+'&amp;maxlon='+lon2+'&amp;kmz=1</href><refreshMode>onInterval</refreshMode><refreshInterval>86400</refreshInterval></Link></NetworkLink></kml>')
+        google.write('<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.google.com/earth/kml/2.0"><NetworkLink><name>Selected stations</name><description>Station List</description><Link><href>'+href+'</href><refreshMode>onInterval</refreshMode><refreshInterval>86400</refreshInterval></Link></NetworkLink></kml>')
     else:
         print('Cannot creat the .kml file, "-R" is required.')

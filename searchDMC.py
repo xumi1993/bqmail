@@ -7,6 +7,7 @@
 #   2015/01/05
 #   2015/02/11
 #   2015/04/29
+#   2015/07/19
 
 
 import distaz, math
@@ -112,7 +113,6 @@ response = rq.urlopen(url)
 html = str(response.read())
 find_re = re.compile(r'<station\s.+?"\s/>',re.DOTALL)
 
-    
 for info in find_re.findall(html):
     sta_info = re.split('\w+="|"\s+?\w+="|"\s/>',info)
     if sta_info == []:
@@ -130,10 +130,7 @@ for info in find_re.findall(html):
         if dis1 < delta.delta < dis2:
             print(netname+' '+staname+' '+stlat+' '+stlon+' '+yrange1+' '+yrange2)
     else:
-        print(netname+' '+staname+' '+stlat+' '+stlon+' '+yrange1+' '+yrange2)
-
-
-        
+        print(netname+' '+staname+' '+stlat+' '+stlon+' '+yrange1+' '+yrange2)       
 
 if iskml:
     if islalo:

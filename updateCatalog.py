@@ -40,8 +40,11 @@ except:
     print('Could not connect to http://www.ldeo.columbia.edu/~gcmt/projects/CMT/catalog/NEW_QUICK/qcmt.ndk')
 
 html = str(response.read())
-find_re = re.compile(r'[A-Z]+\s\d+/\d+/\d+\s.+?\\n',re.DOTALL)
-find_re.findall(html)
+version = sys.version_info.major
+if version == 3:
+    find_re = re.compile(r'[A-Z]+\s\d+/\d+/\d+\s.+?\\n',re.DOTALL)
+else:
+    find_re = re.compile(r'[A-Z]+\s\d+/\d+/\d+\s.+?[\n]',re.DOTALL)
 fid_old = open(inlog,'r')
 all_old_log = fid_old.readlines()
 old_log = all_old_log[-1]

@@ -24,6 +24,7 @@ if opts == []:
     Usage()
     sys.exit(1)
 
+outlog = ''
 for op, value in opts:
     if op == "-I":
         inlog = value

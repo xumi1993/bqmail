@@ -111,8 +111,7 @@ url = url[0:-1]
 
 response = rq.urlopen(url)
 html = str(response.read())
-find_re = re.compile(r'<station\s.+?"\s/>',re.DOTALL)
-
+find_re = re.compile(r'<station\s.+?"/>',re.DOTALL)
 for info in find_re.findall(html):
     sta_info = re.split('\w+="|"\s+?\w+="|"\s/>',info)
     if sta_info == []:

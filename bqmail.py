@@ -19,7 +19,6 @@ def Usage():
     print('-B   -- Time fefore/after origal time of events in seconds.')
     print('-C   -- Channel (e.g., ?H?, HHZ, BH?). Default: BH?')
     print('-c   -- Directory of date time file. formaat: "2015,01,04,1,0,0 2015,01,04,10,0,0"')
-    print('-s   -- Request continuous wave by hour.')
     print('-F   -- File format (SEED or miniseed). Default: SEED')
     print('head.cfg   -- Config file.')
     print('Example: ./bqmail.py -NCB -SNJ2 -Y2015/2/3/2015/4/3 -B0/1000 head.cfg')
@@ -51,7 +50,6 @@ if opts == []:
 
 iscustom = 0
 isyrange = 0
-iscontinue = 0
 chan = "BH?"
 fformat = "seed"
 for op, value in opts:
@@ -127,16 +125,6 @@ if iscustom:
         evenum = evenum.strip('\n')
         evenum_sp = re.split('\W|\s',evenum)
         event.append(evenum_sp)
-        
-elif iscontinue:
-    nowtime = datemin - datetime.timedelta(hours=timeval)
-    while 1:
-        if nowtime >= datemax:
-            break
-        nowtime = nowtime + datetime.timedelta(hours=timeval)
-        endtime = nowtime + datetime.timedelta(hours=timeval)
-        event.append([nowtime.strftime('%Y'),nowtime.strftime('%m'),nowtime.strftime('%d'),nowtime.strftime('%H'),nowtime.strftime('%M'),endtime.strftime('%Y'),endtime.strftime('%m'),endtime.strftime('%d'),endtime.strftime('%H'),endtime.strftime('%M')])
-
 else:
     trange_sp = timerange.split('/')
     btime = float(trange_sp[0])

@@ -16,7 +16,7 @@ def Usage():
     print('-N   -- Network.')
     print('-S   -- Station.')
     print('-Y   -- Date range.')
-    print('-B   -- Time fefore/after origal time of events in seconds.')
+    print('-B   -- Time before/after origal time of events in seconds.')
     print('-C   -- Channel (e.g., ?H?, HHZ, BH?). Default: BH?')
     print('-c   -- Directory of date time file. formaat: "2015,01,04,1,0,0 2015,01,04,10,0,0"')
     print('-F   -- File format (SEED or miniseed). Default: SEED')

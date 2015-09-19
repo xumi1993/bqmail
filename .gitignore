@@ -1,2 +1,10 @@
 
 *.pyc
+
+bin/updateCatalog
+
+bin/bqmail
+
+bin/bqmail_continue
+
+bin/searchDMC

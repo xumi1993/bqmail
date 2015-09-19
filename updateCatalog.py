@@ -6,7 +6,7 @@ try:
 except:
     import urllib as rq
 import re
-import sys, getopt, time, os
+import sys, getopt, os
 import datetime
 
 def Usage():

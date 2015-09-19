@@ -21,7 +21,7 @@ import sys, getopt
 import glob
 
 def Usage():
-    print('Usage: python searchlalo.py -NNetwork -Sstation -Rlon1/lon2/lat1/lat2 -Dlon/lat/dis1/dis2 -Yyear1/mon1/day1/year2/mon2/day2 -Cchannel -K')
+    print('Usage: python searchDMC.py -NNetwork -Sstation -Rlon1/lon2/lat1/lat2 -Dlon/lat/dis1/dis2 -Yyear1/mon1/day1/year2/mon2/day2 -Cchannel -K')
     print('-N   -- Network.')
     print('-S   -- Station.')
     print('-R   -- Search range.')

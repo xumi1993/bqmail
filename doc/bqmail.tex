@@ -1,0 +1,199 @@
+\documentclass[12pt, a4paper]{report}
+
+%%%%%%%%%% Load Package %%%%%%%%%%%
+\usepackage[top=3.0cm,bottom=2.0cm,left=3.5cm,right=3.5cm]{geometry}
+\usepackage{fontspec}
+\usepackage[noblocks,affil-it]{authblk}
+\usepackage[colorlinks = true,
+			linkcolor = cyan,
+            citecolor = blue,
+            anchorcolor = blue]{hyperref}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{titlesec}
+\usepackage{geometry}
+%%%%%%%%%% Set Format %%%%%%%%%%%%%%
+\setmainfont{Times New Roman}
+\newfontfamily{\C}{Consolas}
+\newfontfamily{\tb}{Times New Roman Bold}
+\newfontfamily{\ti}{Times New Roman Italic}
+\lstset{basicstyle=\C\footnotesize,breaklines=true,tabsize=4}
+\linespread{1.3}
+\titleformat{\chapter}{\Huge\bfseries}{\thechapter}{1em}{}
+%%%%%%%%%% First Page %%%%%%%%%%%%%%
+\title{BQMail\\User Manual\\Version 2.3.0}
+\author[1,*]{Mijian Xu}
+\affil[1]{\small School of Earth Science and Engineering, Nanjing University}
+\affil[*]{\small Email: gomijianxu@gmail.com}
+
+%%%%%%%%%%% Doc Begin %%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+%\newgeometry{top=1cm}
+\tableofcontents
+%\restoregeometry
+%===================================%
+%------------ Chapter 1 ------------%
+%===================================%
+\chapter{Introduction}
+
+BQMail is a open source software package for requesting seismic data from Incorporated Research Institutions for Seismology (IRIS) Data Management Center (DMC) using BREQ\_FAST service (\url{http://ds.iris.edu/ds/nodes/dmc/manuals/breq_fast/}). BREQ\_FAST is a wildly used method for batch accessing to the IRIS DMC archive via electronically mailing a specially formatted file to IRIS DMC. User could input parameters (e.g., station name, date range, file format) in command lines, and then the package will automatically create the formatted file and send to IRIS DMC. Meanwhile, User can also use it to search station information by inputing parameters in command lines.
+
+Scripts included in BQMail were developed by Python programming language (\url{https://www.python.org}) on OSX 10.10 platform. The package runs on OSX and Linux/Unix platform. it is not sure that the package can (or cannot) run on Windows platform. BQMail is compatible between Python 2.7 and Python 3.x. The package is distributed under the GNU General Public License Version 3 (GPLv3) as published by the Free Software Foundation (\url{http://www.gnu.org/licenses/gpl.html}).
+
+%===================================%
+%------------ Chapter 2 ------------%
+%===================================%
+\chapter{Installation}
+
+%----------- Section 2.1 -----------%
+\section{Dependencies}
+BQMail depend on standard libraries of Python 2.7 or higher versions, which include datetime, os, re, smtplib, urllib, sys, getopt, glob, ConfigParser/configParser and math.
+
+%----------- Section 2.2 -----------%
+\section{Installation}
+\subsection{Download BQMail}
+After opening a terminal, run the following commands:
+\begin{lstlisting}
+	git clone git://github.com/xumi1993/bqmail.git
+\end{lstlisting}
+\subsection{Install BQMail}
+Entering the root directory of the BQMail, Users can run scripts to use this package. If users wish to use this package in any  directory, run following commands:
+\begin{lstlisting}
+	cd bqmail
+	./install.sh
+\end{lstlisting}
+
+%===================================%
+%------------ Chapter 3 ------------%
+%===================================%
+\chapter{Tutorial}
+%----------- Section 3.1 -----------%
+\section{bqmail}
+bqmail - Request seismic waveform data of events.
+\subsection{Synopsis}
+{\tb bqmail} [{\ti configfile}] {\tb -N}{\ti network} {\tb -S}{\ti station} {\tb -Y}{\ti ymin/mmin/dmin/ymax/mmax/dmax}\\\
+ {\tb -B}{\ti sec\_before/sec\_after} [{\tb -C}{\ti channel}] [{\tb -c}{\ti datetimefile}] [{\tb -F[{\ti seed}|{\ti miniseed}]}]
+\subsection{Required Arguments}
+\begin{description}
+\item[{\ti configfile}] Specify the directory of config file. the config file contains a events list, options of BREQ\_FAST token lines and informations of electronic mail server. The table \ref{tab31} lists options in the config file.
+\begin{table}
+\caption{Options in the config file}
+\centering
+\begin{tabular}{c|c}\toprule[1.5 pt]
+Option & Function \\ \midrule[1 pt]
+{\C eventlst} & The directory of a formatted events list.\\
+{\C NAME} &  The folder name at IRIS DMC ftp site.\\
+{\C INST} & Institution.\\
+{\C EMAIL} & The Email address to send and receive related mail.\\
+{\C MEDIA} & Media for accessing data. [Default is {\C Electronic (FTP)}.]\\
+{\C hosts} & The host name of the smtp server.\\
+{\C port} & The port of the smtp server. [Default is {\C 25}.]\\
+{\C passwd} & Clear text password of the {\C EMAIL}.\\
+\bottomrule[1.5 pt]
+\end{tabular}
+\label{tab31}
+\end{table}
+\item[{\tb -N}{\ti network}] Specify a code of network.
+\item[{\tb -S}{\ti station}] Select a station under the network Specified by {\tb -N}
+\item[{\tb -Y}{\ti ymin/mmin/dmin/ymax/mmax/dmax}] Select a date range during the archive time of the station.
+\item[{\tb -B}{\ti sec\_before/sec\_after}] Set the time duration of each seismogram from {\ti sec\_before} before event time to   {\ti sec\_after} after event time in seconds
+\end{description}
+\subsection{Optional Arguments}
+\begin{description}
+\item[{\tb -C}{\ti channel}] Specify channels like "{\ti ?H?}" or "{\ti HHZ}". [Default is "{\ti BH?}"]. 
+\item[{\tb -c}{\ti datetimefile}] If this argument is specified, {\tb -Y} will be futile. the time range will be specified as a table file with 12 column as following format: [{\ti year1 month1 day1 hour1 minute1 sec1 year2 month2 day2 hour2 minute2 sec2}].
+\item[{\tb -F[{\ti seed}|{\ti miniseed}]}] Select a format (seed or miniseed) to retrieve [Default is {\ti seed}].
+\end{description}
+\subsection{Example}
+To request waveform data by events of CB.NJ2 station from 2013 to 2014, try
+\begin{lstlisting}
+	bqmail head.cfg -NCB -SNJ2 -Y2013/1/1/2014/12/31 -B0/3600 
+\end{lstlisting} 
+
+%----------- Section 3.2 -----------%
+\section{bqmail\_raw}
+bqmail\_raw - Request continuous seismic waveform data by hours.
+\subsection{Synopsis}
+{\tb bqmail\_raw} [{\ti configfile}] {\tb -I}{\ti stationlist} {\tb -Y}{\ti ymin/mmin/dmin/ymax/mmax/dmax} {\tb -H}{\ti hours} [{\tb -C}{\ti channel}] [{\tb -F[{\ti seed}|{\ti miniseed}]}]
+\subsection{Required Arguments}
+\begin{description}
+\item[{\ti configfile}] Specify the directory of config file. the config file contains a events list, options of BREQ\_FAST token lines and informations of electronic mail server. The table \ref{tab31} lists options in the config file.
+\item[{\tb -I}{\ti stationlist}] Select a text file including informations of networks and stations as following format:[{\ti network station}]
+\item[{\tb -Y}{\ti ymin/mmin/dmin/ymax/mmax/dmax}] Select a date range during the archive time of the station.
+\item[{\tb -H}{\ti hours}] Specify a time duration of each retrieving data file in hours.
+\end{description}
+\subsection{Optional Arguments}
+\begin{description}
+\item[{\tb -C}{\ti channel}] Specify channels like "{\ti ?H?}" or "{\ti HHZ}". [Default is "{\ti BH?}"]. 
+\item[{\tb -F[{\ti seed}|{\ti miniseed}]}] Select a format (seed or miniseed) of retrieving data file. [Default is {\ti seed}].
+\end{description}
+\subsection{Example}
+To request continuous seismic waveform data with format of miniseed from 1 Jan. 2015 to 1 Jan. 2015 every 1 day, try
+\begin{lstlisting}
+	bqmail_raw head.cfg -Ista.lst -Y2015/1/1/2015/1/5 -H24 \ 
+	 -Fminiseed
+\end{lstlisting}
+this is a record of the {\ti sta.lst}
+\begin{lstlisting}
+	CB NJ2
+	CB TNC
+	IC BJT
+\end{lstlisting}
+
+%----------- Section 3.3 -----------%
+\section{searchDMC}
+searchDMC - Find stations in IRIS DMC. Stations can be found in different criterions. First, Using {\tb -R} find stations in a box region. Second, Using {\tb -D} find stations in a specified region by epicentral distance. Third, Using {\tb -N [-S]} find stations under a specified network.
+\subsection{Synopsis}
+{\tb searchDMC} [{\tb -N}{\ti network}] [{\tb -S}{\ti station}] [{\tb -R}{\ti lonmin/lonmax/latmin/latmax}] \\\
+[{\tb -D}{\ti lon/lat/dismin/dismax}] [{\tb -Y}{\ti ymin/mmin/dmin/ymax/mmax/dmax}] [{\tb -C}{\ti channel}] [{\tb -K}]
+\subsection{Arguments}
+\begin{description}
+\item[{\tb -N}{\ti network}] Specify a code of network.
+\item[{\tb -S}{\ti station}] Select a station under the network Specified by {\tb -N}
+\item[{\tb -R}{\ti lonmin/lonmax/latmin/latmax}] Limits stations in a box region. Latitude goes from -90 to 90 and longitude goes from -180 to 180.
+\item[{\tb -D}{\ti lon/lat/dismin/dismax}] Limits station in a specified region by epicentral distance between {\ti dismin} and {\ti dismax} from a center at {\ti lat, lon}. The distance goes from 0 to 180.
+\item[{\tb -Y}{\ti ymin/mmin/dmin/ymax/mmax/dmax}] Select a date range during the archive time of the station.
+\item[{\tb -C}{\ti channel}] Specify a channel like "{\ti BHZ}". This argument with unsupported wildcard is different from the one in {\tb bqmail} (or {\tb bqmail\_raw}).
+\item[{\tb -K}] Generates a KML file in current directory. which is used by Google Earth to display station locations and related information based on IRIS DMC metadata.  The argument of {\tb -D} cannot support this function.
+\end{description}
+\subsection{Example}
+To find stations in a box region from 2002 to 2004, use
+\begin{lstlisting}
+	searchDMC -R90/100/20/30 -Y2002/1/1/2004/12/31
+\end{lstlisting}
+To find stations in the region with epicentral distance between 0$^\circ$ and 10$^\circ$ from a center at 25$^\circ$N and 100$^\circ$E, use
+\begin{lstlisting}
+	searchDMC -D100/25/0/10
+\end{lstlisting}
+To find stations under network {\C IC} with channel of {\C HHZ} and Generate a KML file, use
+\begin{lstlisting}
+	searchDMC -NIC -CHHZ -K
+\end{lstlisting}
+
+%----------- Section 3.4 -----------%
+\section{updateCatalog}
+updateCatalog - Automatically update the the events list from Harvard CMT Catalog.
+\subsection{Synopsis}
+{\tb ubdateCatalog} {\tb -I}{\ti inputfile} [{\tb -O}{\ti outputfile}]
+\subsection{Required Arguments}
+\begin{description}
+\item[{\tb -I}{\ti inputfile}] Specify the directory of events list that will be updated.
+\end{description}
+\subsection{Optional Arguments}
+\begin{description}
+\item[{\tb -O}{\ti outputfile}] Specify a output directory of the updated events list. If this argument is not specified, the {\ti inputfile} will be overwritten as a updated events list.
+\end{description}
+\subsection{Example}
+To update the the events list, use
+\begin{lstlisting}
+	updateCatalog -I~/work/EventCMT.dat -O/tmp/Newlist.dat 
+\end{lstlisting}
+\end{document}
+
+
+
+
+
+
+

@@ -9,7 +9,7 @@
 def Usage():
     print('Usage:')
     print('python bqmail.py -Istation.lst -Yyear1/month1/day1/year2/month2/day2 -Cchannel -Hhour -Fformat head.cfg')
-    print('-N   -- Station list. format: Network station')
+    print('-I   -- Station list. format: Network station')
     print('-Y   -- Date range.')
     print('-C   -- Channel (e.g., ?H?, HHZ, BH?). Default: BH?')
     print('-H   -- Request continuous wave by hour.')
@@ -89,7 +89,7 @@ NAME = config.get("info","NAME")
 INST = config.get("info","INST")
 EMAIL = config.get("info","EMAIL")
 MEDIA = config.get("info","MEDIA")
-ALTERNATEMEDIA = config.get("info","ALTERNATEMEDIA")
+ALTERNATEMEDIA = MEDIA
 hosts = config.get("smtp","hosts")
 port =  config.get("smtp","port")
 passwd = config.get("smtp","passwd")

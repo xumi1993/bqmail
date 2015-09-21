@@ -12,7 +12,7 @@
 
 def Usage():
     print('Usage:')
-    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end -Cchannel -cdatetimefile -shour -Fformat head.cfg')
+    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end -Cchannel -cdatetimefile -Fformat head.cfg')
     print('-N   -- Network.')
     print('-S   -- Station.')
     print('-Y   -- Date range.')
@@ -38,7 +38,7 @@ except:
 
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:s:c:F:")
+    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:c:F:")
 except:
     print('Arguments are not found!')
     Usage()
@@ -65,9 +65,6 @@ for op, value in opts:
         iscustom = 1
     elif op == "-B":
         timerange = value
-    elif op == "-s":
-        iscontinue = 1
-        timeval = float(value)
     elif op == "-C":
         chan = value
     elif op == "-F":
@@ -109,7 +106,7 @@ NAME = config.get("info","NAME")
 INST = config.get("info","INST")
 EMAIL = config.get("info","EMAIL")
 MEDIA = config.get("info","MEDIA")
-ALTERNATEMEDIA = config.get("info","ALTERNATEMEDIA")
+ALTERNATEMEDIA = MEDIA
 hosts = config.get("smtp","hosts")
 port =  config.get("smtp","port")
 passwd = config.get("smtp","passwd")

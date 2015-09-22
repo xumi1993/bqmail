@@ -93,19 +93,27 @@ ALTERNATEMEDIA = MEDIA
 hosts = config.get("smtp","hosts")
 port =  config.get("smtp","port")
 passwd = config.get("smtp","passwd")
-recipient = 'breq_fast@iris.washington.edu'
+if fformat.lower() == 'seed':
+    recipient = 'breq_fast@iris.washington.edu'
+elif fformat.lower() == 'miniseed':
+    recipient = 'miniseed@iris.washington.edu'
+else:
+    print('Invalid file format!')
+    sys.exit(1)
 
 sta = []
 fid = open(infile,'r')
 for stainfo in fid.readlines():
     stainfo = stainfo.strip()
     stainfo_sp = stainfo.split()
-    sta.append([stainfo_sp[0], stainfo_sp[1]])
+    if len(stainfo_sp) == 3:
+        sta.append([stainfo_sp[0], stainfo_sp[1], stainfo_sp[2]])
+    else:
+        sta.append([stainfo_sp[0], stainfo_sp[1], ''])
 
 smtp = SMTP(host=hosts, port=port)
 smtp.set_debuglevel(0)
 smtp.login(EMAIL, passwd)
-
 
 nowtime = datemin
 while 1:
@@ -127,14 +135,8 @@ while 1:
     msg += '.LABEL '+LABEL+'\n'
     msg += '.END\n'
     for sta_row in sta:
-        msg += sta_row[1]+' '+sta_row[0]+' '+nowtime.strftime('%Y')+' '+nowtime.strftime('%m')+' '+nowtime.strftime('%d')+' '+nowtime.strftime('%H')+' '+nowtime.strftime('%M')+' 00.0 '+endtime.strftime('%Y')+' '+endtime.strftime('%m')+' '+endtime.strftime('%d')+' '+endtime.strftime('%H')+' '+endtime.strftime('%M')+' 00.0 1 '+chan+'\n'
-    if fformat.lower() == 'seed':
-        smtp.sendmail(EMAIL, 'breq_fast@iris.washington.edu', msg)
-    elif fformat.lower() == 'miniseed':
-        smtp.sendmail(EMAIL, 'miniseed@iris.washington.edu', msg)
-    else:
-        print('Invalid file format!')
-        sys.exit(1)
+        msg += sta_row[1]+' '+sta_row[0]+' '+nowtime.strftime('%Y')+' '+nowtime.strftime('%m')+' '+nowtime.strftime('%d')+' '+nowtime.strftime('%H')+' '+nowtime.strftime('%M')+' 00.0 '+endtime.strftime('%Y')+' '+endtime.strftime('%m')+' '+endtime.strftime('%d')+' '+endtime.strftime('%H')+' '+endtime.strftime('%M')+' 00.0 1 '+chan+' '+sta_row[2]+'\n'
+    smtp.sendmail(EMAIL, recipient, msg)
     print("Successful sending the mail between "+nowtime.strftime('%Y')+'.'+nowtime.strftime('%m')+'.'+nowtime.strftime('%d')+'.'+nowtime.strftime('%H')+" and "+endtime.strftime('%Y')+'.'+endtime.strftime('%m')+'.'+endtime.strftime('%d')+'.'+endtime.strftime('%H')+"!!!")
     nowtime = nowtime + datetime.timedelta(hours=timeval)    
 smtp.quit()

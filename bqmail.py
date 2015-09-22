@@ -12,12 +12,13 @@
 
 def Usage():
     print('Usage:')
-    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end -Cchannel -cdatetimefile -Fformat head.cfg')
+    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end -Cchannel -Llocation -cdatetimefile -Fformat head.cfg')
     print('-N   -- Network.')
     print('-S   -- Station.')
     print('-Y   -- Date range.')
     print('-B   -- Time before/after origal time of events in seconds.')
     print('-C   -- Channel (e.g., ?H?, HHZ, BH?). Default: BH?')
+    print('-L   -- Location identifier.')
     print('-c   -- Directory of date time file. formaat: "2015,01,04,1,0,0 2015,01,04,10,0,0"')
     print('-F   -- File format (SEED or miniseed). Default: SEED')
     print('head.cfg   -- Config file.')
@@ -38,7 +39,7 @@ except:
 
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:c:F:")
+    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:L:c:F:")
 except:
     print('Arguments are not found!')
     Usage()
@@ -52,6 +53,7 @@ iscustom = 0
 isyrange = 0
 chan = "BH?"
 fformat = "seed"
+loca = ''
 for op, value in opts:
     if op == "-N":
         network = value
@@ -67,6 +69,8 @@ for op, value in opts:
         timerange = value
     elif op == "-C":
         chan = value
+    elif op == "-L":
+        loca = value
     elif op == "-F":
         fformat = value
     elif op == "-h":
@@ -97,9 +101,7 @@ if isyrange:
    datemin=datetime.datetime(year1,mon1,day1)
    datemax=datetime.datetime(year2,mon2,day2)
 
-
 event=[]
-
 config.read(head)
 eventlst = config.get("lst","eventlst")
 NAME = config.get("info","NAME")
@@ -110,7 +112,14 @@ ALTERNATEMEDIA = MEDIA
 hosts = config.get("smtp","hosts")
 port =  config.get("smtp","port")
 passwd = config.get("smtp","passwd")
-recipient = 'breq_fast@iris.washington.edu'
+if fformat.lower() == 'seed':
+    recipient = 'breq_fast@iris.washington.edu'
+elif fformat.lower() == 'miniseed':
+    recipient = 'miniseed@iris.washington.edu'
+else:
+    print('Invalid file format!')
+    sys.exit(1)
+
 if isyrange:
    LABEL = 'IRIS_'+str(year1)+"_"+str(year2)+"_"+network+"_"+station
 else:
@@ -140,10 +149,10 @@ else:
         lon=float(evenum_split[8])
         dep=float(evenum_split[9])
         mw=float(evenum_split[10])
-        date = datetime.datetime(year,mon,day,hour,min) + datetime.timedelta(seconds=btime)
-        dateend = datetime.datetime(year,mon,day,hour,min) + datetime.timedelta(seconds=etime)
+        date = datetime.datetime(year,mon,day,hour,min,sec) + datetime.timedelta(seconds=btime)
+        dateend = datetime.datetime(year,mon,day,hour,min,sec) + datetime.timedelta(seconds=etime)
         if datemin <= date <= datemax:
-            event.append([date.strftime('%Y'),date.strftime('%m'),date.strftime('%d'),date.strftime('%H'),date.strftime('%M'),dateend.strftime('%Y'),dateend.strftime('%m'),dateend.strftime('%d'),dateend.strftime('%H'),dateend.strftime('%M')])
+            event.append([date.strftime('%Y'),date.strftime('%m'),date.strftime('%d'),date.strftime('%H'),date.strftime('%M'),date.strftime('%S'),dateend.strftime('%Y'),dateend.strftime('%m'),dateend.strftime('%d'),dateend.strftime('%H'),dateend.strftime('%M'),dateend.strftime('%S')])
 
 
 head = ("From: %s\r\nTo: %s\r\n\r\n" % (EMAIL, recipient))
@@ -159,23 +168,13 @@ msg += '.ALTERNATE MEDIA '+ALTERNATEMEDIA+'\n'
 msg += '.ALTERNATE MEDIA '+ALTERNATEMEDIA+'\n'
 msg += '.LABEL '+LABEL+'\n'
 msg += '.END\n'
-if not iscustom:
-    for row in event:
-       msg += station+' '+network+' '+row[0]+' '+row[1]+' '+row[2]+' '+row[3]+' '+row[4]+' 00.0 '+row[5]+' '+row[6]+' '+row[7]+' '+row[8]+' '+row[9]+' 00.0 1 '+chan+'\n'
-else:
-    for row in event:
-        msg += station+' '+network+' '+row[0]+' '+row[1]+' '+row[2]+' '+row[3]+' '+row[4]+' '+row[5]+' '+row[6]+' '+row[7]+' '+row[8]+' '+row[9]+' '+row[10]+' '+row[11]+' 1 '+chan+'\n'
+for row in event:
+    msg += station+' '+network+' '+row[0]+' '+row[1]+' '+row[2]+' '+row[3]+' '+row[4]+' '+row[5]+' '+row[6]+' '+row[7]+' '+row[8]+' '+row[9]+' '+row[10]+' '+row[11]+' 1 '+chan+' '+loca+'\n'
 
 smtp = SMTP(host=hosts, port=port)
 smtp.set_debuglevel(0)
 smtp.login(EMAIL, passwd)
-if fformat.lower() == 'seed':
-    smtp.sendmail(EMAIL, 'breq_fast@iris.washington.edu', msg)
-elif fformat.lower() == 'miniseed':
-    smtp.sendmail(EMAIL, 'miniseed@iris.washington.edu', msg)
-else:
-    print('Invalid file format!')
-    sys.exit(1)
+smtp.sendmail(EMAIL, recipient, msg)
 smtp.quit()
 print("Successful sending the mail of "+network+"."+station+" to IRIS DMC!!!")
 

@@ -58,7 +58,8 @@ if inlog != outlog:
 else:
     fid_new = open(outlog,'a+')
 i=0
-maxsharp = 80
+maxcol = os.popen('stty size').read().strip().split()[1]
+maxsharp = int(maxcol*0.8)
 print('Writing station info to '+outlog)
 for info in find_re.findall(html):
     num = len(find_re.findall(html))

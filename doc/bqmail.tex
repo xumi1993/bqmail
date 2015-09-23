@@ -21,7 +21,7 @@
 \linespread{1.3}
 \titleformat{\chapter}{\Huge\bfseries}{\thechapter}{1em}{}
 %%%%%%%%%% First Page %%%%%%%%%%%%%%
-\title{BQMail\\User Manual\\Version 2.3.0}
+\title{BQMail\\User Manual\\Version 2.3.2}
 \author[1,*]{Mijian Xu}
 \affil[1]{\small School of Earth Science and Engineering, Nanjing University}
 \affil[*]{\small Email: gomijianxu@gmail.com}
@@ -29,9 +29,8 @@
 %%%%%%%%%%% Doc Begin %%%%%%%%%%%%%%%
 \begin{document}
 \maketitle
-%\newgeometry{top=1cm}
 \tableofcontents
-%\restoregeometry
+
 %===================================%
 %------------ Chapter 1 ------------%
 %===================================%
@@ -72,8 +71,7 @@ In the root directory of BQMail, users may use the package by running the script
 \section{bqmail}
 bqmail - Request seismic waveform data.
 \subsection{Synopsis}
-{\tb bqmail} [{\ti configfile}] {\tb -N}{\ti network} {\tb -S}{\ti station} {\tb -Y}{\ti ymin/mmin/dmin/ymax/mmax/dmax}\\\
- {\tb -B}{\ti sec\_before/sec\_after} [{\tb -C}{\ti channel}] [{\tb -L}{\ti location}] [{\tb -c}{\ti datetimefile}] [{\tb -F[{\ti seed}|{\ti miniseed}]}]
+{\tb bqmail} {\tb -N}{\ti network} {\tb -S}{\ti station} {\tb -Y}{\ti ymin/mmin/dmin/ymax/mmax/dmax} {\tb -B}{\ti sec\_before/sec\_after} [{\tb -C}{\ti channel}] [{\tb -L}{\ti location}] [{\tb -c}{\ti datetimefile}] [{\tb -F[{\ti seed}|{\ti miniseed}]}] {\ti configfile}
 \subsection{Required Arguments}
 \begin{description}
 \item[{\ti configfile}] Specify directory of config file, which contains a events list, BREQ\_FAST options, and information of electronic mail server. The table \ref{tab31} lists options in the config file.
@@ -109,14 +107,14 @@ Option & Function \\ \midrule[1 pt]
 \subsection{Example}
 To request waveform data by events of CB.NJ2 station from 2013 to 2014, try:
 \begin{lstlisting}
-	bqmail head.cfg -NCB -SNJ2 -Y2013/1/1/2014/12/31 -B0/3600 
+	bqmail -NCB -SNJ2 -Y2013/1/1/2014/12/31 -B0/3600 head.cfg
 \end{lstlisting} 
 
 %----------- Section 3.2 -----------%
-\section{bqmail\_raw}
-bqmail\_raw - Request continuous seismic waveform data by hours.
+\section{bqmail\_conti}
+bqmail\_conti - Request continuous seismic waveform data by hours.
 \subsection{Synopsis}
-{\tb bqmail\_raw} [{\ti configfile}] {\tb -I}{\ti stationlist} {\tb -Y}{\ti ymin/mmin/dmin/ymax/mmax/dmax} {\tb -H}{\ti hours} [{\tb -C}{\ti channel}] [{\tb -F[{\ti seed}|{\ti miniseed}]}]
+{\tb bqmail\_conti} {\tb -I}{\ti stationlist} {\tb -Y}{\ti ymin/mmin/dmin/ymax/mmax/dmax} {\tb -H}{\ti hours} [{\tb -C}{\ti channel}] [{\tb -F[{\ti seed}|{\ti miniseed}]}] {\ti configfile}
 \subsection{Required Arguments}
 \begin{description}
 \item[{\ti configfile}] Specify directory of config file. The config file contains a events list, BREQ\_FAST options, and information of electronic mail server. Table \ref{tab31} lists options in the config file.
@@ -132,8 +130,8 @@ bqmail\_raw - Request continuous seismic waveform data by hours.
 \subsection{Example}
 To request continuous seismic waveform data with format of miniseed from 1 Jan. 2015 to 1 Jan. 2015 every 1 day, try:
 \begin{lstlisting}
-	bqmail_raw head.cfg -Ista.lst -Y2015/1/1/2015/1/5 -H24 \ 
-	 -Fminiseed
+	bqmail_conti -Ista.lst -Y2015/1/1/2015/1/5 -H24 -Fminiseed \
+	head.cfg
 \end{lstlisting}
 this is a record of the {\ti sta.lst}
 \begin{lstlisting}
@@ -155,7 +153,7 @@ searchDMC - Find stations in IRIS DMC. Stations defined by different criterions.
 \item[{\tb -R}{\ti lonmin/lonmax/latmin/latmax}] Limits stations in a box region. Latitude is from -90$^\circ$ to 90$^\circ$  and longitude is from -180$^\circ$ to 180$^\circ$.
 \item[{\tb -D}{\ti lon/lat/dismin/dismax}] Limits station in a specified region by epicentral distance between {\ti dismin} and {\ti dismax} from a center at {\ti lat, lon}. The distance is from 0 to 180 degrees.
 \item[{\tb -Y}{\ti ymin/mmin/dmin/ymax/mmax/dmax}] Select a date range during the archive time.
-\item[{\tb -C}{\ti channel}] Specify a channel like "{\ti BHZ}". This argument with unsupported wildcard is different from that in {\tb bqmail} (or {\tb bqmail\_raw}).
+\item[{\tb -C}{\ti channel}] Specify a channel like "{\ti BHZ}". This argument with unsupported wildcard is different from that in {\tb bqmail} (or {\tb bqmail\_conti}).
 \item[{\tb -K}] Generates a KML file in current directory. which is used by Google Earth to display stations and related information based on IRIS DMC metadata. The argument of {\tb -D} does not support this function.
 \end{description}
 \subsection{Example}
@@ -198,3 +196,4 @@ To update the the events list, use
 
 
 
+	

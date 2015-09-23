@@ -4,19 +4,19 @@
 #
 #Revision History:
 #   2015/08/19
+#   2015/09/23
 #
 
 def Usage():
     print('Usage:')
-    print('python bqmail.py -Istation.lst -Yyear1/month1/day1/year2/month2/day2 -Cchannel -Hhour -Fformat head.cfg')
+    print('python bqmail_conti.py -Istation.lst -Yyear1/month1/day1/year2/month2/day2 -Cchannel -Hhour -Fformat head.cfg')
     print('-I   -- Station list. format: Network station')
     print('-Y   -- Date range.')
     print('-C   -- Channel (e.g., ?H?, HHZ, BH?). Default: BH?')
     print('-H   -- Request continuous wave by hour.')
     print('-F   -- File format (SEED or miniseed). Default: SEED')
     print('head.cfg   -- Config file.')
-    print('Example: ./bqmail.py -NCB -SNJ2 -Y2015/2/3/2015/4/3 -B0/1000 head.cfg')
-    print('         ./bqmail.py -NCB -SNJ2 -Y2015/2/3/2015/4/3 -s1 -Fminiseed head.cfg')
+    print('Example: ./bqmail_conti.py -Iex_sta.lst -Y2003/12/3/2003/12/3 -H24 head.cfg')
 
 
 import datetime

@@ -8,3 +8,13 @@ bin/bqmail
 bin/bqmail_continue
 
 bin/searchDMC
+
+doc/.texpadtmp/bqmail.aux
+
+doc/.texpadtmp/bqmail.log
+
+doc/.texpadtmp/bqmail.out
+
+doc/.texpadtmp/bqmail.synctex.gz
+
+doc/.texpadtmp/bqmail.toc

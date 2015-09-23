@@ -23,7 +23,7 @@ def Usage():
     print('-F   -- File format (SEED or miniseed). Default: SEED')
     print('head.cfg   -- Config file.')
     print('Example: ./bqmail.py -NCB -SNJ2 -Y2015/2/3/2015/4/3 -B0/1000 head.cfg')
-    print('         ./bqmail.py -NCB -SNJ2 -Y2015/2/3/2015/4/3 -s1 -Fminiseed head.cfg')
+    print('         ./bqmail.py -NIC -SBJT -Y2015/2/3/2015/4/3 -B-100/600 -L10 -Fminiseed head.cfg')
 
 
 import datetime
@@ -144,7 +144,7 @@ else:
         jjj=int(evenum_split[3])
         hour=int(evenum_split[4])
         min=int(evenum_split[5])
-        sec=float(evenum_split[6])
+        sec=int(evenum_split[6])
         lat=float(evenum_split[7])
         lon=float(evenum_split[8])
         dep=float(evenum_split[9])

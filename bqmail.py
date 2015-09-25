@@ -30,6 +30,7 @@ import datetime
 import os, re
 import sys, getopt
 from smtplib import SMTP
+import time
 try:
     import configparser
     config = configparser.ConfigParser()
@@ -176,5 +177,6 @@ smtp.set_debuglevel(0)
 smtp.login(EMAIL, passwd)
 smtp.sendmail(EMAIL, recipient, msg)
 smtp.quit()
+time.sleep(5)
 print("Successful sending the mail of "+network+"."+station+" to IRIS DMC!!!")
 

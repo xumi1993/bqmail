@@ -23,6 +23,7 @@ import datetime
 import os, re
 import sys, getopt
 from smtplib import SMTP
+import time
 try:
     import configparser
     config = configparser.ConfigParser()
@@ -137,6 +138,7 @@ while 1:
     for sta_row in sta:
         msg += sta_row[1]+' '+sta_row[0]+' '+nowtime.strftime('%Y')+' '+nowtime.strftime('%m')+' '+nowtime.strftime('%d')+' '+nowtime.strftime('%H')+' '+nowtime.strftime('%M')+' 00.0 '+endtime.strftime('%Y')+' '+endtime.strftime('%m')+' '+endtime.strftime('%d')+' '+endtime.strftime('%H')+' '+endtime.strftime('%M')+' 00.0 1 '+chan+' '+sta_row[2]+'\n'
     smtp.sendmail(EMAIL, recipient, msg)
+    time.sleep(5)
     print("Successful sending the mail between "+nowtime.strftime('%Y')+'.'+nowtime.strftime('%m')+'.'+nowtime.strftime('%d')+'.'+nowtime.strftime('%H')+" and "+endtime.strftime('%Y')+'.'+endtime.strftime('%m')+'.'+endtime.strftime('%d')+'.'+endtime.strftime('%H')+"!!!")
     nowtime = nowtime + datetime.timedelta(hours=timeval)    
 smtp.quit()

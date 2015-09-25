@@ -132,25 +132,34 @@ for info in find_re.findall(html):
         print(netname+' '+staname+' '+stlat+' '+stlon+' '+yrange1+' '+yrange2)       
 
 if iskml:
-    if islalo:
-        if network != '':
-            Knetwork = network+'amp;'
-        else:
-            Knetwork = network
-        if station != '':
-            Kstation = network+'amp;'
-        else:
-            Kstation = station
-        if yrange != '':
-            Kyrange = yrange+'amp;'
-        else:
-            Kyrange = yrange
-        if chan != '':
-            Kchan = chan+'amp;'
-        else:
-            Kchan = chan
-        href = 'http://www.iris.edu/cgi-bin/kmlstationinfo?minlat='+lat1+'&amp;maxlat='+lat2+'&amp;minlon='+lon1+'&amp;maxlon='+lon2+'&amp;'+Knetwork+Kstation+Kyrange+Kchan+'kmz=1'
-        google = open('Station_'+lalo+'.kml','w+')
-        google.write('<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.google.com/earth/kml/2.0"><NetworkLink><name>Selected stations</name><description>Station List</description><Link><href>'+href+'</href><refreshMode>onInterval</refreshMode><refreshInterval>86400</refreshInterval></Link></NetworkLink></kml>')
+    if network != '':
+        Knetwork = network+'amp;'
+        netname = re.split('[=|&]', network)[1]
     else:
-        print('Cannot creat the .kml file, "-R" is required.')
+        Knetwork = network
+    if station != '':
+        Kstation = station+'amp;'
+    else:
+        Kstation = station
+    if yrange != '':
+        Kyrange = yrange+'amp;'
+    else:
+        Kyrange = yrange
+    if chan != '':
+        Kchan = chan+'amp;'
+    else:
+        Kchan = chan
+    if islalo:
+        href = 'http://www.iris.edu/cgi-bin/kmlstationinfo?minlat='+lat1+'&amp;maxlat='+lat2+'&amp;minlon='+lon1+'&amp;maxlon='+lon2+'&amp;'+Knetwork+Kstation+Kyrange+Kchan+'kmz=1'
+        with open('Station_'+lalo+'.kml','w+') as google:
+            google.write('<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.google.com/earth/kml/2.0"><NetworkLink><name>Selected stations</name><description>Station List</description><Link><href>'+href+'</href><refreshMode>onInterval</refreshMode><refreshInterval>86400</refreshInterval></Link></NetworkLink></kml>')
+        print('Seccessfully create the Google Earth file: Station_'+lalo+'.kml')
+    else:
+        try:
+            href = 'http://www.iris.edu/cgi-bin/kmlstationinfo?'+Knetwork+Kstation+Kyrange+Kchan+'kmz=1'
+            with open('Station_'+netname+'.kml','w+') as google:
+                google.write('<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.google.com/earth/kml/2.0"><NetworkLink><name>Selected stations</name><description>Station List</description><Link><href>'+href+'</href><refreshMode>onInterval</refreshMode><refreshInterval>86400</refreshInterval></Link></NetworkLink></kml>')
+            print('Seccessfully create the Google Earth file: Station_'+netname+'.kml')
+        except:
+            print('Cannot creat the .kml file, "-R" or "-N" is required.')
+  

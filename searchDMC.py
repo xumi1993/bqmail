@@ -8,7 +8,8 @@
 #   2015/02/11
 #   2015/04/29
 #   2015/07/19
-
+#   2015/09/26
+#
 
 import distaz, math
 try:
@@ -21,7 +22,7 @@ import sys, getopt
 import glob
 
 def Usage():
-    print('Usage: python searchDMC.py -NNetwork -Sstation -Rlon1/lon2/lat1/lat2 -Dlon/lat/dis1/dis2 -Yyear1/mon1/day1/year2/mon2/day2 -Cchannel -K')
+    print('Usage: python searchDMC.py -NNetwork -Sstation -Rlon1/lon2/lat1/lat2 -Dlat/lon/dis1/dis2 -Yyear1/mon1/day1/year2/mon2/day2 -Cchannel -K -G')
     print('-N   -- Network.')
     print('-S   -- Station.')
     print('-R   -- Search range.')
@@ -32,7 +33,7 @@ def Usage():
     
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:], "hR:D:KY:C:N:S:")
+    opts,args = getopt.getopt(sys.argv[1:], "hR:D:KY:C:N:S:G")
 except:
     print('Arguments are not found!')
     Usage()
@@ -44,6 +45,7 @@ if opts == []:
 iskml = 0
 islalo = 0
 isyrange = 0
+isgmt = 0
 lat_lon = ''
 yrange = ''
 chan = ''
@@ -67,6 +69,8 @@ for op, value in opts:
         isyrange = 1
     elif op == "-C":
         chan = 'chan='+value+'&'
+    elif op == "-G":
+        isgmt = 1
     elif op == "-h":
         Usage()
         sys.exit(1)
@@ -84,8 +88,8 @@ if lat_lon != '':
         lalo = lon1+'_'+lon2+'_'+lat1+'_'+lat2
         lalo_label = 'minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2+'&'
     else:
-        lon = lat_lon_split[0]
-        lat = lat_lon_split[1]
+        lon = lat_lon_split[1]
+        lat = lat_lon_split[0]
         dis1 = float(lat_lon_split[2])
         dis2 = float(lat_lon_split[3])
         lon1 = str(0)
@@ -106,12 +110,12 @@ if isyrange:
     day2 = yrange_sp[5]
     yrange = 'timewindow='+year1+'/'+mon1+'/'+day1+'-'+year2+'/'+mon2+'/'+day2+'&'
 
-url += network+station+lalo_label+yrange+chan
-url = url[0:-1]
+url += network+station+lalo_label+yrange+chan+'archive=on'
 
 response = rq.urlopen(url)
 html = str(response.read())
 find_re = re.compile(r'<station\s.+?"/>',re.DOTALL)
+stations = []
 for info in find_re.findall(html):
     sta_info = re.split('\w+="|"\s+?\w+="|"\s/>',info)
     if sta_info == []:
@@ -127,9 +131,33 @@ for info in find_re.findall(html):
     if not islalo and lat_lon != '':
         delta = distaz.distaz(float(lat),float(lon),float(stlat),float(stlon))
         if dis1 < delta.delta < dis2:
-            print(netname+' '+staname+' '+stlat+' '+stlon+' '+yrange1+' '+yrange2)
+            stations.append([netname, staname, float(stlat), float(stlon), yrange1, yrange2])           
     else:
-        print(netname+' '+staname+' '+stlat+' '+stlon+' '+yrange1+' '+yrange2)       
+        stations.append([netname, staname, float(stlat), float(stlon), yrange1, yrange2])       
+for station in stations:
+    print('%s %s %5.2f %5.2f %s %s' % (station[0], station[1], station[2], station[3], station[4], station[5]))
+
+if isgmt:
+    with open('Stations.gmt', 'w+') as gmt:
+        if not islalo and lat_lon != '':
+            center = [float(lat), float(lon)]            
+        elif islalo:
+            center = [(float(lat1)+float(lat2))/2, (float(lon1)+float(lon2))/2]
+        else:
+            netlats = []
+            netlons = []
+            for sta in stations:
+                netlats.append(sta[2])
+                netlons.append(sta[3])
+            center = [(max(netlats)+min(netlats))/2, (max(netlons)+min(netlons))/2]
+        gmt.write('#!/bin/sh\n')
+        gmt.write('ps=stations.ps\n\n')
+        gmt.write('gmt pscoast -Rg -JE%5.2f/%5.2f/5i -Ba30 -Dc -A10000 -Glightgray -Wthinnest -K > $ps\n' % (center[1], center[0]))
+        gmt.write('gmt psxy -R -K -O -J -St0.03i -Gred3 -W0.3p >> $ps << eof\n')
+        for sta in stations:
+            gmt.write('%5.2f %5.2f\n' % (sta[3], sta[2]))
+        gmt.write('eof\n')
+
 
 if iskml:
     if network != '':

@@ -8,11 +8,12 @@
 #   2015/02/11
 #   2015/04/29
 #   2015/05/01
+#   2015/09/26
 #
 
 def Usage():
     print('Usage:')
-    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end -Cchannel -Llocation -cdatetimefile -Fformat head.cfg')
+    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end [-Cchannel] [-Plat/lon/phase] [-Llocation] [-cdatetimefile] [-Fformat] head.cfg')
     print('-N   -- Network.')
     print('-S   -- Station.')
     print('-Y   -- Date range.')
@@ -29,8 +30,9 @@ def Usage():
 import datetime
 import os, re
 import sys, getopt
-from smtplib import SMTP
 import time
+import taup
+import distaz
 try:
     import configparser
     config = configparser.ConfigParser()
@@ -40,7 +42,7 @@ except:
 
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:L:c:F:")
+    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:L:c:F:P:")
 except:
     print('Arguments are not found!')
     Usage()
@@ -49,7 +51,7 @@ if opts == []:
     Usage()
     sys.exit(1)
 
-
+isph = 0
 iscustom = 0
 isyrange = 0
 chan = "BH?"
@@ -74,6 +76,12 @@ for op, value in opts:
         loca = value
     elif op == "-F":
         fformat = value
+    elif op == "-P":
+        stla = float(value.split('/')[0])
+        stlo = float(value.split('/')[1])
+        phase = value.split('/')[2]
+        isph = 1
+        mod=taup.TauPyModel(model='iasp91')
     elif op == "-h":
         Usage()
         sys.exit(1)
@@ -110,9 +118,6 @@ INST = config.get("info","INST")
 EMAIL = config.get("info","EMAIL")
 MEDIA = config.get("info","MEDIA")
 ALTERNATEMEDIA = MEDIA
-hosts = config.get("smtp","hosts")
-port =  config.get("smtp","port")
-passwd = config.get("smtp","passwd")
 if fformat.lower() == 'seed':
     recipient = 'breq_fast@iris.washington.edu'
 elif fformat.lower() == 'miniseed':
@@ -150,14 +155,20 @@ else:
         lon=float(evenum_split[8])
         dep=float(evenum_split[9])
         mw=float(evenum_split[10])
-        date = datetime.datetime(year,mon,day,hour,min,sec) + datetime.timedelta(seconds=btime)
-        dateend = datetime.datetime(year,mon,day,hour,min,sec) + datetime.timedelta(seconds=etime)
-        if datemin <= date <= datemax:
-            event.append([date.strftime('%Y'),date.strftime('%m'),date.strftime('%d'),date.strftime('%H'),date.strftime('%M'),date.strftime('%S'),dateend.strftime('%Y'),dateend.strftime('%m'),dateend.strftime('%d'),dateend.strftime('%H'),dateend.strftime('%M'),dateend.strftime('%S')])
-
-
-head = ("From: %s\r\nTo: %s\r\n\r\n" % (EMAIL, recipient))
-msg = head
+        evt_time = datetime.datetime(year,mon,day,hour,min,sec)
+        if datemin <= evt_time <= datemax:
+            if isph == 1:
+                dis = distaz.distaz(stla, stlo, lat, lon).delta
+                arr = mod.get_travel_times(source_depth_in_km=dep, distance_in_degree=dis, phase_list=[phase])
+                if len(arr) != 0:
+                    arr_time = evt_time + datetime.timedelta(seconds=arr[0].time)
+                    date = arr_time - datetime.timedelta(seconds=btime)
+                    dateend = arr_time + datetime.timedelta(seconds=etime)
+            else:
+                date = evt_time + datetime.timedelta(seconds=btime)
+                dateend = evt_time + datetime.timedelta(seconds=etime)
+            event.append([date.strftime('%Y %m %d %H %M %S'), dateend.strftime('%Y %m %d %H %M %S')])
+msg = ''               
 msg += '.NAME '+NAME+'\n'
 msg += '.INST '+INST+'\n'
 msg += '.MAIL\n'
@@ -170,13 +181,11 @@ msg += '.ALTERNATE MEDIA '+ALTERNATEMEDIA+'\n'
 msg += '.LABEL '+LABEL+'\n'
 msg += '.END\n'
 for row in event:
-    msg += station+' '+network+' '+row[0]+' '+row[1]+' '+row[2]+' '+row[3]+' '+row[4]+' '+row[5]+' '+row[6]+' '+row[7]+' '+row[8]+' '+row[9]+' '+row[10]+' '+row[11]+' 1 '+chan+' '+loca+'\n'
-
-smtp = SMTP(host=hosts, port=port)
-smtp.set_debuglevel(0)
-smtp.login(EMAIL, passwd)
-smtp.sendmail(EMAIL, recipient, msg)
-smtp.quit()
-time.sleep(5)
+    msg += station+' '+network+' '+row[0]+' '+row[1]+' 1 '+chan+' '+loca+'\n'
+with open('tmp.bq','w') as fid_msg:
+    fid_msg.write(msg)
+os.system('mail '+recipient+'<tmp.bq')
 print("Successful sending the mail of "+network+"."+station+" to IRIS DMC!!!")
+os.system('rm tmp.bq')
+time.sleep(4)
 

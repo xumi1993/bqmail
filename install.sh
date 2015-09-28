@@ -5,8 +5,22 @@ ln -s `pwd`/searchDMC.py `pwd`/bin/searchDMC
 ln -s `pwd`/updateCatalog.py `pwd`/bin/updateCatalog
 ln -s `pwd`/bqmail_conti.py `pwd`/bin/bqmail_conti
 if [ `uname` == "Darwin" ]; then
-   echo "export PATH=`pwd`/bin:\$PATH" >> ~/.bash_profile
+   if grep "export PATH=`pwd`/bin:\$PATH" ~/.bash_profile
+   then
+      echo "BQMail was already installed."
+   else
+      echo "# BQMail" >> ~/.bash_profile
+      echo "export PATH=`pwd`/bin:\$PATH" >> ~/.bash_profile
+      echo "Successfully install the BQMail."
+   fi
 else
-   echo "export PATH=`pwd`/bin:\$PATH" >> ~/.bashrc
+   if grep "export PATH=`pwd`/bin:\$PATH" ~/.bashrc
+   then
+      echo "BQMail was already installed."
+   else
+      echo "# BQMail" >> ~/.bashrc
+      echo "export PATH=`pwd`/bin:\$PATH" >> ~/.bashrc
+      echo "Successfully install the BQMail."
+   fi
 fi
 exec $SHELL -l

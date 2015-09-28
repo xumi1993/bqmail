@@ -40,9 +40,17 @@ except:
     import ConfigParser
     config = ConfigParser.ConfigParser()
 
+head = ''
+argv = sys.argv[1:]
+for o in argv:
+    if os.path.isfile(o):
+        head = o
+        argv.remove(o)
+        break
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:], "hN:S:C:Y:B:L:c:F:P:")
+    opts,args = getopt.getopt(argv, "hN:S:C:Y:B:L:c:F:P:")
+    print(argv)
 except:
     print('Arguments are not found!')
     Usage()
@@ -89,12 +97,7 @@ for op, value in opts:
         Usage()
         sys.exit(1)
 
-head = []
-for o in sys.argv[1:]:
-    if os.path.isfile(o):
-        head = o
-        break
-if head == []:
+if head == '':
     print("Head file are not exist!")
     Usage()
     sys.exit(1)

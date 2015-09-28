@@ -9,7 +9,7 @@
 
 def Usage():
     print('Usage:')
-    print('python bqmail_conti.py -Istation.lst -Yyear1/month1/day1/year2/month2/day2 -Cchannel -Hhour -Fformat head.cfg')
+    print('python bqmail_conti.py -Istation.lst -Yyear1/month1/day1/year2/month2/day2 -Hhour [-Cchannel] [-Fformat] head.cfg')
     print('-I   -- Station list. format: Network station')
     print('-Y   -- Date range.')
     print('-C   -- Channel (e.g., ?H?, HHZ, BH?). Default: BH?')
@@ -30,9 +30,16 @@ except:
     import ConfigParser
     config = ConfigParser.ConfigParser()
 
+head = ''
+argv = sys.argv[1:]
+for o in argv:
+    if os.path.isfile(o):
+        head = o
+        argv.remove(o)
+        break
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:], "hI:C:Y:H:F:")
+    opts,args = getopt.getopt(argv, "hI:C:Y:H:F:")
 except:
     print('Arguments are not found!')
     Usage()
@@ -61,12 +68,7 @@ for op, value in opts:
         Usage()
         sys.exit(1)
 
-head = []
-for o in sys.argv[1:]:
-    if os.path.isfile(o):
-        head = o
-        break
-if head == []:
+if head == '':
     print("Head file are not exist!")
     Usage()
     sys.exit(1)

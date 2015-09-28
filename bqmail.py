@@ -50,7 +50,6 @@ for o in argv:
 
 try:
     opts,args = getopt.getopt(argv, "hN:S:C:Y:B:L:c:F:P:")
-    print(argv)
 except:
     print('Arguments are not found!')
     Usage()

@@ -134,8 +134,8 @@ for info in find_re.findall(html):
             stations.append([netname, staname, float(stlat), float(stlon), yrange1, yrange2])           
     else:
         stations.append([netname, staname, float(stlat), float(stlon), yrange1, yrange2])       
-for station in stations:
-    print('%s %s %5.2f %5.2f %s %s' % (station[0], station[1], station[2], station[3], station[4], station[5]))
+for sta_r in stations:
+    print('%s %s %5.2f %5.2f %s %s' % (sta_r[0], sta_r[1], sta_r[2], sta_r[3], sta_r[4], sta_r[5]))
 
 if isgmt:
     with open('Stations.gmt', 'w+') as gmt:

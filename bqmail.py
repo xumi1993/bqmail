@@ -13,7 +13,7 @@
 
 def Usage():
     print('Usage:')
-    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end [-Cchannel] [-Plat/lon/phase] [-Llocation] [-cdatetimefile] [-Fformat] head.cfg')
+    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end [-Cchannel] [-Plat/lon/phase] [-Llocation] [-cdatetimefile] [-Fformat] [-Mmagmin/magmax] head.cfg')
     print('-N   -- Network.')
     print('-S   -- Station.')
     print('-Y   -- Date range.')
@@ -49,7 +49,7 @@ for o in argv:
         break
 
 try:
-    opts,args = getopt.getopt(argv, "hN:S:C:Y:B:L:c:F:P:")
+    opts,args = getopt.getopt(argv, "hN:S:C:Y:B:L:c:F:P:M:")
 except:
     print('Arguments are not found!')
     Usage()
@@ -64,6 +64,8 @@ isyrange = 0
 chan = "BH?"
 fformat = "seed"
 loca = ''
+magmin = 0
+magmax = 10
 for op, value in opts:
     if op == "-N":
         network = value
@@ -89,6 +91,9 @@ for op, value in opts:
         phase = value.split('/')[2]
         isph = 1
         mod=taup.TauPyModel(model='iasp91')
+    elif op == "-M":
+        magmin = float(value.split('/')[0])
+        magmax = float(value.split('/')[1])
     elif op == "-h":
         Usage()
         sys.exit(1)
@@ -157,6 +162,8 @@ else:
         lon=float(evenum_split[8])
         dep=float(evenum_split[9])
         mw=float(evenum_split[10])
+        if mw < magmin or mw > magmax:
+            continue
         evt_time = datetime.datetime(year,mon,day,hour,min,sec)
         if datemin <= evt_time <= datemax:
             if isph == 1:

@@ -9,6 +9,7 @@
 #   2015/04/29
 #   2015/05/01
 #   2015/09/26
+#   2015/11/06
 #
 
 def Usage():
@@ -19,9 +20,11 @@ def Usage():
     print('-Y   -- Date range.')
     print('-B   -- Time before/after origal time of events in seconds.')
     print('-C   -- Channel (e.g., ?H?, HHZ, BH?). Default: BH?')
+    print('-P   -- specify the lat/lon of station and require data by phase. e.g., 20/100/SKS')
     print('-L   -- Location identifier.')
-    print('-c   -- Directory of date time file. formaat: "2015,01,04,1,0,0 2015,01,04,10,0,0"')
+    print('-c   -- Directory of date time file. format: "2015,01,04,1,0,0 2015,01,04,10,0,0"')
     print('-F   -- File format (SEED or miniseed). Default: SEED')
+    print('-M   -- Magnitude range.')
     print('head.cfg   -- Config file.')
     print('Example: ./bqmail.py -NCB -SNJ2 -Y2015/2/3/2015/4/3 -B0/1000 head.cfg')
     print('         ./bqmail.py -NIC -SBJT -Y2015/2/3/2015/4/3 -B-100/600 -L10 -Fminiseed head.cfg')
@@ -31,7 +34,7 @@ import datetime
 import os, re
 import sys, getopt
 import time
-import taup
+from obspy import taup
 import distaz
 try:
     import configparser
@@ -140,10 +143,12 @@ else:
    
 if iscustom:
     EVENT = open(datetimefile,'r')
-    for evenum in EVENT:
+    for evenum in EVENT.readlines():
         evenum = evenum.strip('\n')
         evenum_sp = re.split('\W|\s',evenum)
-        event.append(evenum_sp)
+        date_beg = datetime.datetime(int(evenum_sp[0]),int(evenum_sp[1]),int(evenum_sp[2]),int(evenum_sp[3]),int(evenum_sp[4]),int(evenum_sp[5]))
+        date_end = datetime.datetime(int(evenum_sp[6]),int(evenum_sp[7]),int(evenum_sp[8]),int(evenum_sp[9]),int(evenum_sp[10]),int(evenum_sp[11]))
+        event.append([date_beg.strftime('%Y %m %d %H %M %S'), date_end.strftime('%Y %m %d %H %M %S')])
 else:
     trange_sp = timerange.split('/')
     btime = float(trange_sp[0])

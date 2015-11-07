@@ -152,7 +152,7 @@ if isgmt:
             center = [(max(netlats)+min(netlats))/2, (max(netlons)+min(netlons))/2]
         gmt.write('#!/bin/sh\n')
         gmt.write('ps=stations.ps\n\n')
-        gmt.write('gmt pscoast -Rg -JE%5.2f/%5.2f/5i -Ba30 -Dc -A10000 -Glightgray -Wthinnest -K > $ps\n' % (center[1], center[0]))
+        gmt.write('gmt pscoast -Rg -JN0/10i -Ba30 -Dc -A10000 -Glightgray -Wthinnest -K > $ps\n' % (center[1], center[0]))
         gmt.write('gmt psxy -R -K -O -J -St0.03i -Gred3 -W0.3p >> $ps << eof\n')
         for sta in stations:
             gmt.write('%5.2f %5.2f\n' % (sta[3], sta[2]))

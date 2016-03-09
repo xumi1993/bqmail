@@ -33,7 +33,7 @@ def Usage():
     
 
 try:
-    opts,args = getopt.getopt(sys.argv[1:], "hR:D:KY:C:N:S:G")
+    opts,args = getopt.getopt(sys.argv[1:], "hR:D:KY:C:N:S:Gr")
 except:
     print('Arguments are not found!')
     Usage()
@@ -42,6 +42,7 @@ if opts == []:
     Usage()
     sys.exit(1)
 
+isgsn = 0
 iskml = 0
 islalo = 0
 isyrange = 0
@@ -51,13 +52,18 @@ yrange = ''
 chan = ''
 network = ''
 station = ''
+realtime = ''
 lalo_label = ''
 for op, value in opts:
     if op == "-R":
         lat_lon = value
         islalo = 1
     elif op == "-N":
-        network = 'net='+value+'&'
+        if value == "GSN":
+            network = ''
+            isgsn = 1
+        else:
+            network = 'net='+value+'&'
     elif op == "-S":
         station = 'sta='+value+'&'
     elif op == "-K":
@@ -69,6 +75,8 @@ for op, value in opts:
         isyrange = 1
     elif op == "-C":
         chan = 'chan='+value+'&'
+    elif op == "-r":
+        realtime = "realtime=on&"
     elif op == "-G":
         isgmt = 1
     elif op == "-h":
@@ -99,7 +107,10 @@ if lat_lon != '':
         lalo = lon+'_'+lat+'_'+lat_lon_split[2]
         lalo_label = 'minlat='+lat1+'&maxlat='+lat2+'&minlon='+lon1+'&maxlon='+lon2+'&'
 
-url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?'
+if isgsn:
+    url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo/_GSN?'
+else:
+    url = 'http://ds.iris.edu/cgi-bin/xmlstationinfo?'
 if isyrange:
     yrange_sp = yrange.split("/")
     year1 = yrange_sp[0]
@@ -110,11 +121,10 @@ if isyrange:
     day2 = yrange_sp[5]
     yrange = 'timewindow='+year1+'/'+mon1+'/'+day1+'-'+year2+'/'+mon2+'/'+day2+'&'
 
-url += network+station+lalo_label+yrange+chan+'archive=on'
-
+url += network+station+lalo_label+yrange+chan+realtime+'archive=on'
 response = rq.urlopen(url)
 html = str(response.read())
-find_re = re.compile(r'<station\s.+?"/>',re.DOTALL)
+find_re = re.compile(r'<station\s.+?/>',re.DOTALL)
 stations = []
 for info in find_re.findall(html):
     sta_info = re.split('\w+="|"\s+?\w+="|"\s/>',info)

@@ -30,11 +30,15 @@ def wget(url, path):
     resp.wait()
 
 argv = sys.argv[1:]
+if argv == []:
+    Usage()
+    sys.exit(1)
 path = "./"
 try:
     opts, args = getopt.getopt(argv, "u:n:P:")
 except:
     print("Arguments are not found!")
+    Usage()
     sys.exit(1)
 for op, value in opts:
     if op == "-n":
@@ -44,6 +48,7 @@ for op, value in opts:
     elif op == "-P":
         path = value
     else:
+        Usage()
         sys.exit(1)
 
 url = "http://ds.iris.edu/pub/userdata/"+username

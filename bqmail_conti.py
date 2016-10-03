@@ -89,8 +89,7 @@ EMAIL = config.get("info","EMAIL")
 MEDIA = config.get("info","MEDIA")
 ALTERNATEMEDIA = MEDIA
 if fformat.lower() == 'seed':
-#    recipient = 'breq_fast@iris.washington.edu'
-    recipient = "gomijianxu@gmail.com"
+    recipient = 'breq_fast@iris.washington.edu'
 elif fformat.lower() == 'miniseed':
     recipient = 'miniseed@iris.washington.edu'
 else:

@@ -8,7 +8,10 @@
 # 
 
 import os
-import urllib.request as rq
+try:
+    import urllib.request as rq
+except:
+    import urllib as rq
 import re
 from multiprocessing.dummy import Pool as ThreadPool 
 import subprocess
@@ -51,7 +54,7 @@ find_re = re.compile(r'href=.+?>',re.DOTALL)
 for line in find_re.findall(content):
     if line.find("seed") > 0:
         lst.append(line[6:-2])
-lstpath = os.path.expanduser("~"),".IRIS.lst")
+lstpath = os.path.join(os.path.expanduser("~"),".IRIS.lst")
 if not os.path.exists(lstpath):
     os.mknod(lstpath, mode=0o600)
 with open(listpath, "r+") as f:

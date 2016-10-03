@@ -25,7 +25,9 @@ def Usage():
     print("    -n Specify thread number at parallel downloading")
     print("    -u Specify username in user directory on the IRIS.")
 
-def wget(url, path):
+def wget(url_path):
+    url = url_path[0]
+    path = url_path[1]
     resp = subprocess.Popen("wget -c -nc -P "+path+" "+url,shell=True)
     resp.wait()
 
@@ -74,11 +76,10 @@ for item in same_item:
 if lst == []:
     print("The whole date were downloaded from IRIS DMC.")
     sys.exit(1)
-link_lst = [url+"/"+line for line in lst]
+link_lst = [[url+"/"+line, path] for line in lst]
 pool = ThreadPool(thread)
 print("start downloading")
-path_lst = [path]*len(link_lst)
-results = pool.map(wget, link_lst, path_lst)
+results = pool.map(wget, link_lst)
 pool.close() 
 pool.join()
 

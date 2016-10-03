@@ -62,7 +62,7 @@ for line in find_re.findall(content):
 lstpath = os.path.join(os.path.expanduser("~"),".IRIS.lst")
 if not os.path.exists(lstpath):
     os.mknod(lstpath, mode=0o600)
-with open(listpath, "r+") as f:
+with open(lstpath, "r+") as f:
     oldlst = [line.strip() for line in f.readlines()]
 with open(lstpath, "w+") as f:
     for line in lst:

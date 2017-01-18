@@ -62,8 +62,9 @@ for line in find_re.findall(content):
     if line.find("seed") > 0:
         lst.append(line[6:-2])
 lstpath = os.path.join(os.path.expanduser("~"),".IRIS.lst")
+print(lstpath)
 if not os.path.exists(lstpath):
-    os.mknod(lstpath, mode=0o600)
+    os.mknod(lstpath)
 with open(lstpath, "r+") as f:
     oldlst = [line.strip() for line in f.readlines()]
 with open(lstpath, "w+") as f:

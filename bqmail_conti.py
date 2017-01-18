@@ -141,6 +141,7 @@ if isrange:
         if check_send:
             print("Successful sending the mail from "+nowtime.strftime('%Y.%m.%d.%H')+" to "+endtime.strftime('%Y.%m.%d.%H')+"!!!")
             time.sleep(5)
+            nowtime = endtime
         else:
             print("Some error occured")
 else:

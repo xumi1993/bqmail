@@ -23,14 +23,18 @@ except:
 
 def Usage():
     print('Usage:')
-    print('python bqmail_conti.py -Istation.lst -Yyear1/month1/day1/year2/month2/day2 -Hhour [-Cchannel] [-Fformat] head.cfg')
+    print('python bqmail_conti.py -I<station.lst> -b<start-time> -e<end-time> -H<hour_val> [-Cchannel] [-Fformat] head.cfg')
     print('-I   -- Station list. format: Network station')
-    print('-Y   -- Date range.')
+    print("-b   -- Limit to events occurring on or after the specified start time.\n"
+          "        Date and time format: YYYY-MM-DDThh:mm:ss (e.g., 1997-01-31T12:04:32)\n"
+          "                             YYYY-MM-DD (e.g., 1997-01-31)")
+    print("-e   -- Limit to events occurring on or before the specified end time\n"
+          "        with the same date and time format as \"-b\".")
     print('-C   -- Channel (e.g., ?H?, HHZ, BH?). Default: BH?')
     print('-H   -- Request continuous wave by hour.')
     print('-F   -- File format (SEED or miniseed). Default: SEED')
     print('head.cfg   -- Config file.')
-    print('Example: ./bqmail_conti.py -Iex_sta.lst -Y2003/12/3/2003/12/4 -H24 head.cfg')
+    print('Example: bqmail_conti -Iex_sta.lst -b2016-01-01 -e2016-03-01 -H24 head.cfg')
 
 
 head = ''

@@ -15,10 +15,14 @@
 
 def Usage():
     print('Usage:')
-    print('python bqmail.py -Nnetwork -Sstation -Yyear1/month1/day1/year2/month2/day2 -Bsec_begin/sec_end [-Cchannel] [-Plat/lon/phase] [-Llocation] [-cdatetimefile] [-Fformat] [-Mmagmin/magmax] head.cfg')
+    print('python bqmail.py -Nnetwork -Sstation -b -Bsec_begin/sec_end [-Cchannel] [-Plat/lon/phase] [-Llocation] [-cdatetimefile] [-Fformat] [-Mmagmin/magmax] head.cfg')
     print('-N   -- Network.')
     print('-S   -- Station.')
-    print('-Y   -- Date range.')
+    print('-b   -- Limit to events occurring on or after the specified start time.\n'
+          '        Date and time format: YYYY-MM-DDThh:mm:ss (e.g., 1997-01-31T12:04:32)\n'
+          '                              YYYY-MM-DD (e.g., 1997-01-31)')
+    print('-e   -- Limit to events occurring on or before the specified end time\n'
+          '        with the same date and time format as \"-b\".')
     print('-B   -- Time before/after origal time of events in seconds.')
     print('-C   -- Channel (e.g., ?H?, HHZ, BH?). Default: BH?')
     print('-P   -- specify the lat/lon of station and require data by phase. e.g., 20/100/SKS')
@@ -54,7 +58,7 @@ for o in argv:
         break
 
 try:
-    opts,args = getopt.getopt(argv, "hN:S:C:Y:B:L:c:F:P:M:")
+    opts,args = getopt.getopt(argv, "hN:S:C:b:e:B:L:c:F:P:M:")
 except:
     print('Arguments are not found!')
     Usage()
@@ -64,8 +68,7 @@ if opts == []:
     sys.exit(1)
 
 isph = 0
-iscustom = 0
-isyrange = 0
+isyrange = 1
 chan = "BH?"
 fformat = "seed"
 loca = ''
@@ -76,12 +79,13 @@ for op, value in opts:
         network = value
     elif op == "-S":
         station = value
-    elif op == "-Y":
-        yrange = value
-        isyrange = 1
+    elif op == "-b":
+        starttime = value
+    elif op == "-e":
+        endtime = value
     elif op == "-c":
         datetimefile = value
-        iscustom = 1
+        isyrange = 0
     elif op == "-B":
         timerange = value
     elif op == "-C":
@@ -110,17 +114,35 @@ if head == '':
     print("Head file are not exist!")
     Usage()
     sys.exit(1)
-    
+
+ops = [op for op, value in opts]
+if '-b' in ops and '-e' in ops:
+    isyrange = 1
+elif '-c' in ops:
+    isyrange = 0
+else:
+    print('-b and -e must be set at same time otherwise please set -c as custom')
+    sys.exit(1)
+
 if isyrange:
-   y_split = yrange.split('/')
-   year1 = int(y_split[0])
-   mon1 = int(y_split[1])
-   day1 = int(y_split[2])
-   year2 = int(y_split[3])
-   mon2 = int(y_split[4])
-   day2 = int(y_split[5])
-   datemin=datetime.datetime(year1,mon1,day1)
-   datemax=datetime.datetime(year2,mon2,day2)
+    if "T" in starttime:
+        strfmt = "%Y-%m-%dT%H:%M:%S"
+    else:
+        strfmt = "%Y-%m-%d"
+    try:
+        datemin = datetime.datetime.strptime(starttime,strfmt)
+    except:
+        print("Wrong format in -b option")
+        sys.exit(1)
+    if "T" in endtime:
+        strfm = "%Y-%m-%dT%H:%M:%S"
+    else:
+        strfmt = "%Y-%m-%d"
+    try:
+        datemax = datetime.datetime.strptime(endtime,strfmt)
+    except:
+        print("Wrong format in -e option")
+        sys.exit(1)
 
 event=[]
 config.read(head)
@@ -139,11 +161,11 @@ else:
     sys.exit(1)
 
 if isyrange:
-   LABEL = 'IRIS_'+str(year1)+"_"+str(year2)+"_"+network+"_"+station
+   LABEL = 'IRIS_'+datemin.strftime('%Y')+"_"+datemax.strftime('%Y')+"_"+network+"_"+station
 else:
    LABEL = 'IRIS_'+network+"_"+station
 
-if iscustom:
+if not isyrange:
     EVENT = open(datetimefile,'r')
     for evenum in EVENT.readlines():
         evenum = evenum.strip('\n')
@@ -155,7 +177,7 @@ else:
     trange_sp = timerange.split('/')
     btime = float(trange_sp[0])
     etime = float(trange_sp[1])
-    EVENT = open(eventlst,'r+')
+    EVENT = open(eventlst,'r')
     for evenum in EVENT:
         evenum_split = evenum.split()
         year=int(evenum_split[0])
@@ -184,6 +206,8 @@ else:
                 date = evt_time + datetime.timedelta(seconds=btime)
                 dateend = evt_time + datetime.timedelta(seconds=etime)
             event.append([date.strftime('%Y %m %d %H %M %S'), dateend.strftime('%Y %m %d %H %M %S')])
+    if event == []:
+        print('No events found in the range')
 
 msg = generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL)
 for row in event:
@@ -194,3 +218,4 @@ try:
     time.sleep(4)
 except:
     print('ERROR in sending mail')
+    sys.exit(1)

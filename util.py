@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 import subprocess
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
+from email.mime.multipart import MIMEMultipart
 
 def generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL):
     msg = ''
@@ -17,11 +21,18 @@ def generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL):
     msg += '.END\n'
     return msg
 
-def sendmail(recipient, msg):
-    p = subprocess.Popen(["mail",recipient], stdin=subprocess.PIPE)
+def sendmail(recipient, contents, name='bqmail'):
+    msg = MIMEMultipart("alternatvie")
+    msg['Subject'] = Header("BREQ_fast", 'utf-8')
+    msg['From'] = Header(name, 'utf-8')
+    msg['To'] = recipient
+    text_part = MIMEText(contents, 'text')
+    msg.attach(text_part)
     try:
-        p.communicate(msg.encode())
-        p.wait()
-        return True
-    except:
-        return False
+        smtpObj = smtplib.SMTP('localhost')
+        smtpObj.sendmail('localhost', recipient, msg.as_string())
+    except smtplib.SMTPException:
+        print("Error when send mail")
+
+if __name__ == '__main__':
+    sendmail('gomijianxu@163.com', 'test')

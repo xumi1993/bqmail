@@ -29,6 +29,3 @@ def sendmail(recipient, contents):
         smtpObj.sendmail('localhost', recipient, msg.as_string())
     except smtplib.SMTPException:
         print("Error when send mail")
-
-if __name__ == '__main__':
-    sendmail('gomijianxu@gmail.com', 'test')

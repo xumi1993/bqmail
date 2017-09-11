@@ -21,13 +21,9 @@ def generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL):
     msg += '.END\n'
     return msg
 
-def sendmail(recipient, contents, name='bqmail'):
-    msg = MIMEMultipart("alternatvie")
-    msg['Subject'] = Header("BREQ_fast", 'utf-8')
-    msg['From'] = Header(name, 'utf-8')
-    msg['To'] = recipient
-    text_part = MIMEText(contents, 'text')
-    msg.attach(text_part)
+def sendmail(recipient, contents): 
+    msg = MIMEText(contents, 'text')
+    msg['Subject'] = 'BREQ_fast'
     try:
         smtpObj = smtplib.SMTP('localhost')
         smtpObj.sendmail('localhost', recipient, msg.as_string())
@@ -35,4 +31,4 @@ def sendmail(recipient, contents, name='bqmail'):
         print("Error when send mail")
 
 if __name__ == '__main__':
-    sendmail('gomijianxu@163.com', 'test')
+    sendmail('gomijianxu@gmail.com', 'test')

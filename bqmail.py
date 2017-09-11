@@ -10,6 +10,7 @@
 #   2015/05/01
 #   2015/09/26
 #   2015/11/06
+#   2017/09/11
 #
 
 def Usage():
@@ -36,6 +37,7 @@ import sys, getopt
 import time
 from obspy import taup
 import distaz
+from util import sendmail,generatemsg
 try:
     import configparser
     config = configparser.ConfigParser()
@@ -140,7 +142,7 @@ if isyrange:
    LABEL = 'IRIS_'+str(year1)+"_"+str(year2)+"_"+network+"_"+station
 else:
    LABEL = 'IRIS_'+network+"_"+station
-   
+
 if iscustom:
     EVENT = open(datetimefile,'r')
     for evenum in EVENT.readlines():
@@ -182,24 +184,13 @@ else:
                 date = evt_time + datetime.timedelta(seconds=btime)
                 dateend = evt_time + datetime.timedelta(seconds=etime)
             event.append([date.strftime('%Y %m %d %H %M %S'), dateend.strftime('%Y %m %d %H %M %S')])
-msg = ''               
-msg += '.NAME '+NAME+'\n'
-msg += '.INST '+INST+'\n'
-msg += '.MAIL\n'
-msg += '.EMAIL '+EMAIL+'\n'
-msg += '.PHONE\n'
-msg += '.FAX\n'
-msg += '.MEDIA '+MEDIA+'\n'
-msg += '.ALTERNATE MEDIA '+ALTERNATEMEDIA+'\n'
-msg += '.ALTERNATE MEDIA '+ALTERNATEMEDIA+'\n'
-msg += '.LABEL '+LABEL+'\n'
-msg += '.END\n'
+
+msg = generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL)
 for row in event:
     msg += station+' '+network+' '+row[0]+' '+row[1]+' 1 '+chan+' '+loca+'\n'
-with open('tmp.bq','w') as fid_msg:
-    fid_msg.write(msg)
-os.system('mail '+recipient+'<tmp.bq')
-print("Successful sending the mail of "+network+"."+station+" to IRIS DMC!!!")
-os.system('rm tmp.bq')
-time.sleep(4)
-
+try:
+    sendmail(recipient, msg)
+    print("Successful sending the mail of "+network+"."+station+" to IRIS DMC!!!")
+    time.sleep(4)
+except:
+    print('ERROR in sending mail')

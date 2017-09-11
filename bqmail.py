@@ -31,8 +31,8 @@ def Usage():
     print('-F   -- File format (SEED or miniseed). Default: SEED')
     print('-M   -- Magnitude range.')
     print('head.cfg   -- Config file.')
-    print('Example: ./bqmail.py -NCB -SNJ2 -Y2015/2/3/2015/4/3 -B0/1000 head.cfg')
-    print('         ./bqmail.py -NIC -SBJT -Y2015/2/3/2015/4/3 -B-100/600 -L10 -Fminiseed head.cfg')
+    print('Example: ./bqmail.py -NCB -SNJ2 -b2015-2-3 -e2015-4-3 -B0/1000 head.cfg')
+    print('         ./bqmail.py -NIC -SBJT -b2015-2-3T00:12:23 -e2015-4-3 -B-100/600 -L10 -Fminiseed head.cfg')
 
 
 import datetime

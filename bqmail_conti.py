@@ -153,11 +153,11 @@ else:
         msg = generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL)
         for sta_row in sta:
             msg += sta_row[1]+' '+sta_row[0]+' '+nowtime.strftime('%Y %m %d %H %M %S')+' '+endtime.strftime('%Y %m %d %H %M %S')+' 1 '+chan+' '+sta_row[2]+'\n'
-        check_send = sendmail(recipient, msg)
-        if check_send:
+        try:
+            sendmail(recipient, msg)
             print("Successful sending the mail from "+nowtime.strftime('%Y.%m.%d.%H')+" to "+endtime.strftime('%Y.%m.%d.%H')+"!!!")
             time.sleep(5)
-        else:
+        except:
             print("Some error occured")
 
 

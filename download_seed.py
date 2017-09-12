@@ -19,7 +19,7 @@ import sys
 import getopt
 
 def Usage():
-    print("Usage: download_seed.py -n<thread-num> -u<user-name> [-P<out-path>]")
+    print("Usage: download_seed.py  -u<user-name> [-n<thread-num>] [-P<out-path>] [filename]")
     print("    -P Specify out path of downloaded seed files.")
     print("       Default: current dirctory")
     print("    -n Specify thread number at parallel downloading")
@@ -36,6 +36,7 @@ if argv == []:
     Usage()
     sys.exit(1)
 path = "./"
+filename = None
 try:
     opts, args = getopt.getopt(argv, "u:n:P:")
 except:
@@ -53,20 +54,30 @@ for op, value in opts:
         Usage()
         sys.exit(1)
 
+for op in argv:
+    if op[0] != '-':
+        thread = 1
+        filename = op
+
 url = "http://ds.iris.edu/pub/userdata/"+username
 html = rq.urlopen(url)
 content = html.read().decode()
 lst = []
-find_re = re.compile(r'href=.+?>',re.DOTALL)
-for line in find_re.findall(content):
-    if line.find("seed") > 0:
-        lst.append(line[6:-2])
+if filename == None:
+    find_re = re.compile(r'href=.+?>',re.DOTALL)
+    for line in find_re.findall(content):
+        if line.find("seed") > 0:
+            lst.append(line[6:-2])
+else:
+    lst.append(filename)
 lstpath = os.path.join(os.path.expanduser("~"),".IRIS.lst")
 print(lstpath)
 if not os.path.exists(lstpath):
     os.mknod(lstpath)
-with open(lstpath, "r+") as f:
-    oldlst = [line.strip() for line in f.readlines()]
+    oldlst = []
+else:
+    with open(lstpath, "r+") as f:
+        oldlst = [line.strip() for line in f.readlines()]
 with open(lstpath, "w+") as f:
     for line in lst:
         f.write(line+"\n")

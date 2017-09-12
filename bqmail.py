@@ -31,7 +31,7 @@ def Usage():
     print('-F   -- File format (SEED or miniseed). Default: SEED')
     print('-M   -- Magnitude range.')
     print('head.cfg   -- Config file.')
-    print('Example: ./bqmail.py -NCB -SNJ2 -b2015-2-3 -e2015-4-3 -B0/1000 head.cfg')
+    print('Example: ./bqmail.py -NCB -SNJ2 -b2015-2-3 -e2015-4-3 -P32.05/118.85/P -B-200/1000 head.cfg')
     print('         ./bqmail.py -NIC -SBJT -b2015-2-3T00:12:23 -e2015-4-3 -B-100/600 -L10 -Fminiseed head.cfg')
 
 
@@ -179,18 +179,19 @@ else:
     etime = float(trange_sp[1])
     EVENT = open(eventlst,'r')
     for evenum in EVENT:
-        evenum_split = evenum.split()
-        year=int(evenum_split[0])
-        mon=int(evenum_split[1])
-        day=int(evenum_split[2])
-        jjj=int(evenum_split[3])
-        hour=int(evenum_split[4])
-        min=int(evenum_split[5])
-        sec=int(evenum_split[6])
-        lat=float(evenum_split[7])
-        lon=float(evenum_split[8])
-        dep=float(evenum_split[9])
-        mw=float(evenum_split[10])
+        evenum = evenum.strip()
+        (year, mon, day, jjj, hour, min, sec, lat, lon, dep, mw) = evenum.split()
+        year = int(year)
+        mon = int(mon)
+        day = int(day)
+        jjj = int(jjj)
+        hour = int(hour)
+        min = int(min)
+        sec = int(sec)
+        lat = float(lat)
+        lon = float(lon)
+        dep = float(dep)
+        mw = float(mw)
         if mw < magmin or mw > magmax:
             continue
         evt_time = datetime.datetime(year,mon,day,hour,min,sec)
@@ -200,7 +201,7 @@ else:
                 arr = mod.get_travel_times(source_depth_in_km=dep, distance_in_degree=dis, phase_list=[phase])
                 if len(arr) != 0:
                     arr_time = evt_time + datetime.timedelta(seconds=arr[0].time)
-                    date = arr_time - datetime.timedelta(seconds=btime)
+                    date = arr_time + datetime.timedelta(seconds=btime)
                     dateend = arr_time + datetime.timedelta(seconds=etime)
             else:
                 date = evt_time + datetime.timedelta(seconds=btime)

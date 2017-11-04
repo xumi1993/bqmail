@@ -137,13 +137,13 @@ if isrange:
         msg = generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL)
         for sta_row in sta:
             msg += sta_row[1]+' '+sta_row[0]+' '+nowtime.strftime('%Y %m %d %H %M %S')+' '+endtime.strftime('%Y %m %d %H %M %S')+' 1 '+chan+' '+sta_row[2]+'\n'
-        check_send = sendmail(recipient, msg)
-        if check_send:
+        try:
+            sendmail(recipient, msg)
             print("Successful sending the mail from "+nowtime.strftime('%Y.%m.%d.%H')+" to "+endtime.strftime('%Y.%m.%d.%H')+"!!!")
             time.sleep(5)
             nowtime = endtime
-        else:
-            print("Some error occured")
+        except:
+            print("Some error occured in sending mail")
 else:
     with open(datetimefile) as f:
         datelst = [datetime.datetime.strptime(line.strip(), "%Y.%m.%d") for line in f.readlines()]
@@ -158,7 +158,7 @@ else:
             print("Successful sending the mail from "+nowtime.strftime('%Y.%m.%d.%H')+" to "+endtime.strftime('%Y.%m.%d.%H')+"!!!")
             time.sleep(5)
         except:
-            print("Some error occured")
+            print("Some error occured in sending mail")
 
 
 

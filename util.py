@@ -6,6 +6,7 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 
+
 def generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL):
     msg = ''
     msg += '.NAME '+NAME+'\n'
@@ -21,11 +22,22 @@ def generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL):
     msg += '.END\n'
     return msg
 
-def sendmail(recipient, contents): 
+
+def sendmail(sender, recipient, contents, server='localhost', port=465, passwd=''):
     msg = MIMEText(contents, 'text')
     msg['Subject'] = 'BREQ_fast'
-    try:
-        smtpObj = smtplib.SMTP('localhost')
-        smtpObj.sendmail('localhost', recipient, msg.as_string())
-    except smtplib.SMTPException:
-        print("Error when send mail")
+    msg['From'] = 'bqmail<'+sender+'>'
+    msg['To'] = recipient
+    if server == 'localhost':
+        try:
+            smtpObj = smtplib.SMTP(server)
+            smtpObj.sendmail(sender, recipient, msg.as_string())
+        except smtplib.SMTPException:
+            print("Error when send mail by localhost")
+    else:
+        try:
+            smtpObj = smtplib.SMTP_SSL(server, port)
+            smtpObj.login(sender, passwd)
+            smtpObj.sendmail(sender, recipient, msg.as_string())
+        except smtplib.SMTPException:
+            print("Error in linking {}".format(server))

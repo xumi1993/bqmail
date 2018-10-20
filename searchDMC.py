@@ -19,7 +19,7 @@ except:
 import os
 import re
 import sys, getopt
-import glob
+
 
 def Usage():
     print('Usage: python searchDMC.py -NNetwork -Sstation -Rlon1/lon2/lat1/lat2 -Dlat/lon/dis1/dis2 -Yyear1/mon1/day1/year2/mon2/day2 -Cchannel -K -G')
@@ -30,7 +30,10 @@ def Usage():
     print('-Y   -- Date range')
     print('-C   -- Channel (e.g., BHZ)')
     print('-K   -- Output Google Earth kml file.')
-    
+
+
+def dateparse(date):
+    return re.sub(r'/', '-', date)
 
 try:
     opts,args = getopt.getopt(sys.argv[1:], "hR:D:KY:C:N:S:Gr")
@@ -136,8 +139,8 @@ for info in find_re.findall(html):
     stlon = sta_info[5]
     if sta_info[-2] == 'No archive data':
         continue
-    yrange1 = sta_info[-5]
-    yrange2 = sta_info[-4]
+    yrange1 = dateparse(sta_info[-5])
+    yrange2 = dateparse(sta_info[-4])
     if not islalo and lat_lon != '':
         delta = distaz.distaz(float(lat),float(lon),float(stlat),float(stlon))
         if dis1 < delta.delta < dis2:

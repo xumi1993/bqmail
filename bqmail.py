@@ -146,11 +146,16 @@ if isyrange:
 
 event=[]
 config.read(head)
-eventlst = config.get("lst","eventlst")
-NAME = config.get("info","NAME")
-INST = config.get("info","INST")
-EMAIL = config.get("info","EMAIL")
-MEDIA = config.get("info","MEDIA")
+eventlst = config.get("lst", "eventlst")
+NAME = config.get("info", "NAME")
+INST = config.get("info", "INST")
+EMAIL = config.get("info", "EMAIL")
+MEDIA = config.get("info", "MEDIA")
+
+server = config.get('smtp', 'server')
+passwd = config.get('smtp', 'password')
+port = config.getint('smtp', 'port')
+
 ALTERNATEMEDIA = MEDIA
 if fformat.lower() == 'seed':
     recipient = 'breq_fast@iris.washington.edu'
@@ -166,7 +171,7 @@ else:
    LABEL = 'IRIS_'+network+"_"+station
 
 if not isyrange:
-    EVENT = open(datetimefile,'r')
+    EVENT = open(datetimefile, 'r')
     for evenum in EVENT.readlines():
         evenum = evenum.strip('\n')
         evenum_sp = re.split('\W|\s',evenum)
@@ -213,10 +218,14 @@ else:
 msg = generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL)
 for row in event:
     msg += station+' '+network+' '+row[0]+' '+row[1]+' 1 '+chan+' '+loca+'\n'
+
 try:
-    sendmail(recipient, msg)
-    print("Successful sending the mail of "+network+"."+station+" to IRIS DMC!!!")
+    if server == '' or passwd == '':
+        sendmail(EMAIL, recipient, msg)
+    else:
+        sendmail(EMAIL, recipient, msg, server=server, passwd=passwd, port=port)
     time.sleep(4)
-except:
-    print('ERROR in sending mail')
+    print("Successful sending the mail of " + network + "." + station + " to IRIS DMC!!!")
+except Exception as e:
+    print('ERROR in sending mail\n{}'.format(e))
     sys.exit(1)

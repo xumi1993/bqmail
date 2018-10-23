@@ -13,6 +13,18 @@
 #   2017/09/11
 #
 
+
+import datetime
+import os, re
+import sys, getopt
+import time
+from obspy import taup, UTCDateTime
+import distaz
+from util import sendmail, generatemsg, wsfetch
+import configparser
+config = configparser.ConfigParser()
+
+
 def Usage():
     print('Usage:')
     print('python bqmail.py -Nnetwork -Sstation -b -Bsec_begin/sec_end [-Cchannel] [-Plat/lon/phase] [-Llocation] [-cdatetimefile] [-Fformat] [-Mmagmin/magmax] head.cfg')
@@ -34,20 +46,6 @@ def Usage():
     print('Example: bqmail -NCB -SNJ2 -b2015-2-3 -e2015-4-3 -P32.05/118.85/P -B-200/1000 head.cfg')
     print('         bqmail -NIC -SBJT -b2015-2-3T00:12:23 -e2015-4-3 -B-100/600 -L10 -Fminiseed head.cfg')
 
-
-import datetime
-import os, re
-import sys, getopt
-import time
-from obspy import taup
-import distaz
-from util import sendmail,generatemsg
-try:
-    import configparser
-    config = configparser.ConfigParser()
-except:
-    import ConfigParser
-    config = ConfigParser.ConfigParser()
 
 head = ''
 argv = sys.argv[1:]
@@ -125,24 +123,8 @@ else:
     sys.exit(1)
 
 if isyrange:
-    if "T" in starttime:
-        strfmt = "%Y-%m-%dT%H:%M:%S"
-    else:
-        strfmt = "%Y-%m-%d"
-    try:
-        datemin = datetime.datetime.strptime(starttime,strfmt)
-    except:
-        print("Wrong format in -b option")
-        sys.exit(1)
-    if "T" in endtime:
-        strfm = "%Y-%m-%dT%H:%M:%S"
-    else:
-        strfmt = "%Y-%m-%d"
-    try:
-        datemax = datetime.datetime.strptime(endtime,strfmt)
-    except:
-        print("Wrong format in -e option")
-        sys.exit(1)
+    datemin = UTCDateTime(starttime)
+    datemax = UTCDateTime(endtime)
 
 event=[]
 config.read(head)
@@ -170,6 +152,7 @@ if isyrange:
 else:
    LABEL = 'IRIS_'+network+"_"+station
 
+
 if not isyrange:
     EVENT = open(datetimefile, 'r')
     for evenum in EVENT.readlines():
@@ -182,37 +165,20 @@ else:
     trange_sp = timerange.split('/')
     btime = float(trange_sp[0])
     etime = float(trange_sp[1])
-    EVENT = open(eventlst,'r')
-    for evenum in EVENT:
-        evenum = evenum.strip()
-        (year, mon, day, jjj, hour, min, sec, lat, lon, dep, mw) = evenum.split()
-        year = int(year)
-        mon = int(mon)
-        day = int(day)
-        jjj = int(jjj)
-        hour = int(hour)
-        min = int(min)
-        sec = int(sec)
-        lat = float(lat)
-        lon = float(lon)
-        dep = float(dep)
-        mw = float(mw)
-        if mw < magmin or mw > magmax:
-            continue
-        evt_time = datetime.datetime(year,mon,day,hour,min,sec)
-        if datemin <= evt_time <= datemax:
-            if isph == 1:
-                dis = distaz.distaz(stla, stlo, lat, lon).delta
-                arr = mod.get_travel_times(source_depth_in_km=dep, distance_in_degree=dis, phase_list=[phase])
-                if len(arr) != 0:
-                    arr_time = evt_time + datetime.timedelta(seconds=arr[0].time)
-                    date = arr_time + datetime.timedelta(seconds=btime)
-                    dateend = arr_time + datetime.timedelta(seconds=etime)
-            else:
-                date = evt_time + datetime.timedelta(seconds=btime)
-                dateend = evt_time + datetime.timedelta(seconds=etime)
+    cat = wsfetch('IRIS', starttime=datemin, endtime=datemax, minmagnitude=magmin, maxmagnitude=magmax)
+    for evt in cat:
+        if isph:
+            dis = distaz.distaz(stla, stlo, evt[1], evt[2]).delta
+            arr = mod.get_travel_times(source_depth_in_km=evt[3], distance_in_degree=dis, phase_list=[phase])
+            if len(arr) != 0:
+                arr_time = evt[0] + arr[0].time
+                date = arr_time + btime
+                dateend = arr_time + etime
+        else:
+            date = evt[0] + btime
+            dateend = evt[0] + etime
             event.append([date.strftime('%Y %m %d %H %M %S'), dateend.strftime('%Y %m %d %H %M %S')])
-    if event == []:
+    if not event:
         print('No events found in the range')
 
 msg = generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL)

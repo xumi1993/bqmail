@@ -1,11 +1,11 @@
 #!/bin/bash
 mkdir ./bin
+rm -f ./bin/*
 ln -s `pwd`/bqmail.py `pwd`/bin/bqmail
 ln -s `pwd`/searchDMC.py `pwd`/bin/searchDMC
 ln -s `pwd`/updateCatalog.py `pwd`/bin/updateCatalog
 ln -s `pwd`/bqmail_conti.py `pwd`/bin/bqmail_conti
 ln -s `pwd`/download_seed.py `pwd`/bin/download_seed
-'''
 if [ `uname` == "Darwin" ]; then
    if grep "export PATH=`pwd`/bin:\$PATH" ~/.bash_profile
    then
@@ -26,4 +26,3 @@ else
    fi
 fi
 exec $SHELL -l
-'''

@@ -18,7 +18,7 @@ def wsfetch(server, starttime=None, endtime=None, minlatitude=None,
     client = Client(server)
     cat = client.get_events(**locs)
     data = [[evt.origins[0].time, evt.origins[0].latitude, evt.origins[0].longitude, evt.origins[0].depth * 0.001,
-             evt.magnitudes[0].mag, evt.magnitudes[0].magnitude_type] for evt in cat]
+             evt.magnitudes[0].mag] for evt in cat if evt.origins[0].depth is not None]
     return data
 
 

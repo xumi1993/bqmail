@@ -180,6 +180,7 @@ else:
             event.append([date.strftime('%Y %m %d %H %M %S'), dateend.strftime('%Y %m %d %H %M %S')])
     if not event:
         print('No events found in the range')
+        sys.exit(1)
 
 msg = generatemsg(NAME, INST, EMAIL, MEDIA, ALTERNATEMEDIA, LABEL)
 for row in event:

@@ -1,5 +1,12 @@
 # BQMail
+[![Build Status](https://travis-ci.com/xumi1993/bqmail.svg?branch=master)](https://travis-ci.com/xumi1993/bqmail)
+[![PyPI](https://img.shields.io/pypi/v/bqmail)](https://pypi.org/project/bqmail/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/bqmail)]()
+[![PyPI - License](https://img.shields.io/pypi/l/bqmail)]()
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/xumi1993/bqmail)](https://github.com/xumi1993/bqmail/tags)
 
+![GitHub forks](https://img.shields.io/github/forks/xumi1993/bqmail?style=social)
+![GitHub stars](https://img.shields.io/github/stars/xumi1993/bqmail?style=social)
 
 **BQMail** is a Python module for sending mails to apply for seismic data from the IRIS DMC. It is a front-end API of the BREQ_fast.
 
@@ -26,7 +33,7 @@ pip install .
 from bqmail.mail import BQMail
 from obspy import UTCDateTime
 
-bq = BQMail('xxx@163.com', server='smtp.163.com', password='xxx', username='bqmail')
+bq = BQMail('xxx@xxx.com', server='smtp.xxx.com', password='xxx', username='bqmail')
 bq.query_events(starttime=UTCDateTime(2017, 1, 1), endtime=UTCDateTime(2018, 1, 1),
                 minmagnitude=5.5, catalog='GCMT')
 bq.query_stations(network='CB', station='LZH')

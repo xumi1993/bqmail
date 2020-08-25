@@ -5,7 +5,7 @@ python:
 install:
 - pip install .
 script:
-- get_station -n CB
+- get_stations -n CB
 deploy:
   provider: pypi
   username: "__token__"

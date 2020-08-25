@@ -28,9 +28,10 @@ def Usage():
 def wget(url_path):
     url = url_path[0]
     path = url_path[1]
-    resp = subprocess.Popen("wget -c -nc -P "+path+" "+url,shell=True)
+    resp = subprocess.Popen("wget -c -nc -P "+path+" "+url, shell=True)
     resp.wait()
 
+thread = 1
 argv = sys.argv[1:]
 if argv == []:
     Usage()
@@ -63,21 +64,20 @@ url = "http://ds.iris.edu/pub/userdata/"+username
 html = rq.urlopen(url)
 content = html.read().decode()
 lst = []
+print(filename)
 if filename == None:
-    find_re = re.compile(r'href=.+?>',re.DOTALL)
+    find_re = re.compile(r'href=".+?">',re.DOTALL)
     for line in find_re.findall(content):
-        if line.find("seed") > 0:
+        if line.find("mseed") > 0:
             lst.append(line[6:-2])
 else:
     lst.append(filename)
 lstpath = os.path.join(os.path.expanduser("~"),".IRIS.lst")
-print(lstpath)
-if not os.path.exists(lstpath):
-    os.mknod(lstpath)
-    oldlst = []
-else:
+if os.path.exists(lstpath):
     with open(lstpath, "r+") as f:
         oldlst = [line.strip() for line in f.readlines()]
+else:
+    oldlst = []
 with open(lstpath, "w+") as f:
     for line in lst:
         f.write(line+"\n")

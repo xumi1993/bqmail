@@ -4,7 +4,7 @@ python:
 - 3.7
 - 3.8
 install:
-- pip install certifi
+- pip install certifi -U
 - pip install .
 script:
 - get_stations -n CB

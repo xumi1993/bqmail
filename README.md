@@ -8,10 +8,10 @@
 ![GitHub forks](https://img.shields.io/github/forks/xumi1993/bqmail?style=social)
 ![GitHub stars](https://img.shields.io/github/stars/xumi1993/bqmail?style=social)
 
-**BQMail** is a Python module for sending mails to apply for seismic data from the IRIS DMC. It is a front-end API of the BREQ_fast.
+**BQMail** is a Python module for sending mails to apply for seismic data from the [IRIS DMC](http://www.ds.iris.edu/ds/nodes/dmc/). It is a front-end API of the [BREQ_fast](http://ds.iris.edu/ds/nodes/dmc/manuals/breq_fast/).
 
 ## Installation
-**BQMail** can currently run on Linux and MAC OSX. **BQMail** is running and testing on Python 3.7.
+**BQMail** can currently run on Linux and MAC OSX. **BQMail** is running and testing on Python 3.6/3.7/3.8.
 ### Installation via PyPI
 ```
 pip install bqmail
@@ -20,7 +20,7 @@ pip install bqmail
 ### Installation from source code
 The latest version of the **BQMail** is available on Gitlab:
 ```
-git clone https://git.nju.edu.cn/xumi1993/bqmail2.0.git bqmail
+git clone https://github.com/xumi1993/bqmail.git bqmail
 ``` 
 Then you can install this version:
 ```

@@ -5,12 +5,12 @@ packages = find_packages()
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-VERSION = "2.1.0"
+VERSION = "2.1.1"
 setup(name='bqmail',
       version=VERSION,
       author='Mijian Xu',
       author_email='gomijianxu@gmail.com',
-      url='https://git.nju.edu.cn/xumi1993/bqmail2.0',
+      url='https://github.com/xumi1993/bqmail',
       long_description=long_description,
       long_description_content_type="text/markdown",
       license='MIT',

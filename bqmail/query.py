@@ -177,7 +177,7 @@ def get_stations():
     for net in query.stations:
         for sta in net:
             print('{} {} {:.4f} {:.4f} {} {} {}'.format(net.code, sta.code,
-                  sta.latitude, sta.longitude, sta.start_date, sta.end_date,
+                  sta.latitude, sta.longitude, sta.elevation, sta.start_date, sta.end_date,
                   sta.restricted_status))
 
 

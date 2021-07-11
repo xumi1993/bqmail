@@ -75,6 +75,7 @@ class BQMail():
         self.media = media
         self.msgs = ''
         self.label = ''
+        self.evtinfo = ''
         self.header = generatemsg(username, inst, mailname, media)
 
     def query_stations(self, **kwargs):
@@ -83,10 +84,12 @@ class BQMail():
     def query_events(self, **kwargs):
         self.query.get_events(**kwargs)
 
-    def send_mail(self, arrange='events', write_mail=False, **kwargs):
+    def send_mail(self, arrange='events', write_mail=False, write_evtinfo=False, **kwargs):
         if arrange == 'events':
             self.event_mail(**kwargs)
         elif arrange == 'continue':
+            if write_evtinfo:
+                raise ValueError('\'write_evtinfo\' can only be used when arrange=\'events\'')
             self.conti_mail(**kwargs)
         else:
             raise ValueError('variable arrange must be in \'events\' and \'continue\'')
@@ -100,6 +103,9 @@ class BQMail():
         if write_mail:
             with open('msg.{}'.format(self.label), 'w') as f:
                 f.write(self.msgs)
+        if write_evtinfo:
+            with open('evtinfo.{}'.format(self.label), 'w') as f:
+                f.write(self.evtinfo)
 
     def conti_mail(self, starttime=UTCDateTime(2000, 1, 1),
                    endtime=UTCDateTime.now(), time_val_in_hours=24,
@@ -113,7 +119,7 @@ class BQMail():
             for net in self.query.stations:
                 for sta in net:
                     self.msgs += '{} {} {} {} 1 {} {}\n'.format(
-                                 sta.code, net.code, sdt.strftime('%Y %m %d %H %M %S'), 
+                                 sta.code, net.code, sdt.strftime('%Y %m %d %H %M %S'),
                                  edt.strftime('%Y %m %d %H %M %S'), channel, location)
 
     def event_mail(self, time_before=0, time_after=1000,
@@ -124,22 +130,36 @@ class BQMail():
         for net in self.query.stations:
             for sta in net:
                 if mark == 'o':
-                    for i, evt in self.query.events.iterrows():
-                        b_time = (evt['date'] + time_before).strftime('%Y %m %d %H %M %S')
-                        e_time = (evt['date'] + time_after).strftime('%Y %m %d %H %M %S')
+                    for _, evt in self.query.events.iterrows():
+                        b_time = evt['date'] + time_before
+                        b_time_str = b_time.strftime('%Y %m %d %H %M %S')
+                        e_time_str = (evt['date'] + time_after).strftime('%Y %m %d %H %M %S')
+                        self.evtinfo += '{} {} {} {} {:.3f} {:.3f} {:.3f} {:.1f} {}\n'.format(
+                                        sta.code, net.code,
+                                        b_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                        evt['date'].strftime('%Y-%m-%dT%H:%M:%S'),
+                                        evt['evla'], evt['evlo'], evt['evdp'], evt['mag'],
+                                        evt['magtype'])
                         self.msgs += '{} {} {} {} 1 {} {}\n'.format(
-                                     sta.code, net.code, b_time, e_time,
+                                     sta.code, net.code, b_time_str, e_time_str,
                                      channel, location)
                 else:
-                    for i, evt in self.query.events.iterrows():
+                    for _, evt in self.query.events.iterrows():
                         ttime = self.get_ttime(evt, sta, phase=mark)
                         if ttime is None:
                             continue
                         else:
-                            b_time = (evt['date'] + ttime + time_before).strftime('%Y %m %d %H %M %S')
-                            e_time = (evt['date'] + ttime + time_after).strftime('%Y %m %d %H %M %S')
+                            b_time = evt['date'] + ttime + time_before
+                            b_time_str = b_time.strftime('%Y %m %d %H %M %S')
+                            e_time_str = (evt['date'] + ttime + time_after).strftime('%Y %m %d %H %M %S')
+                            self.evtinfo += '{} {} {} {} {:.3f} {:.3f} {:.3f} {:.1f} {}\n'.format(
+                                            sta.code, net.code,
+                                            b_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                            evt['date'].strftime('%Y-%m-%dT%H:%M:%S'),
+                                            evt['evla'], evt['evlo'], evt['evdp'], evt['mag'],
+                                            evt['magtype'])
                             self.msgs += '{} {} {} {} 1 {} {}\n'.format(
-                                         sta.code, net.code, b_time, e_time,
+                                         sta.code, net.code, b_time_str, e_time_str,
                                          channel, location)
 
     def get_ttime(self, evt, obspy_station, phase='P'):

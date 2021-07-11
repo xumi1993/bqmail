@@ -5,7 +5,7 @@ packages = find_packages()
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-VERSION = "2.1.1"
+VERSION = "2.1.2"
 setup(name='bqmail',
       version=VERSION,
       author='Mijian Xu',

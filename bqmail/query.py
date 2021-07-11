@@ -1,3 +1,4 @@
+from numpy.lib.arraysetops import isin
 from obspy.clients.fdsn import Client
 from obspy import UTCDateTime
 from datetime import timedelta

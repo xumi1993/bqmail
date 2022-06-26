@@ -1,6 +1,5 @@
-from numpy.lib.arraysetops import isin
 from obspy.clients.fdsn import Client
-from obspy import UTCDateTime
+from obspy import UTCDateTime, Catalog
 from datetime import timedelta
 import pandas as pd
 import argparse
@@ -21,8 +20,20 @@ class Query():
 
     def get_events(self, starttime=UTCDateTime(2000, 1, 1),
                    endtime=UTCDateTime.now(), **kwargs):
-        events = self.client.get_events(starttime=starttime,
-                                        endtime=endtime, **kwargs)
+
+        chunk_length = 365 * 86400  # Query length in seconds
+        events = Catalog()
+        while starttime <= endtime:
+            print(starttime)
+            events += self.client.get_events(starttime=starttime,
+                                             endtime=starttime + chunk_length,
+                                             **kwargs)
+            if starttime + chunk_length > endtime:
+                chunk = endtime - starttime
+                if chunk <= 1:
+                    break
+            starttime += chunk_length
+            
         self.events = _cat2df(events)
 
     def get_stations(self, includerestricted=False, **kwargs):

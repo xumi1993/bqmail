@@ -23,7 +23,7 @@ setup(name='bqmail',
       include_package_data=True,
       zip_safe=False,
       classifiers=['Programming Language :: Python',
-                   'Programming Language :: Python :: 3.8',
                    'Programming Language :: Python :: 3.9',
-                   'Programming Language :: Python :: 3.10']
+                   'Programming Language :: Python :: 3.10',
+                   'Programming Language :: Python :: 3.11']
       )

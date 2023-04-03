@@ -11,7 +11,8 @@
 
 For **Chinese users**, please refer to our [chinese blog](https://blog.xumijian.me/tags/bqmail/).
 ## Installation
-**BQMail** can currently run on Linux and MAC OSX. **BQMail** is running and testing on Python 3.6/3.7/3.8.
+**BQMail** can currently run on Linux and MAC OSX. **BQMail** is running and testing on Python 3.9/3.10/3.11.
+
 ### Installation via PyPI
 ```
 pip install bqmail

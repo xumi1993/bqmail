@@ -1,8 +1,8 @@
 from bqmail.mail import BQMail
 from obspy import UTCDateTime
 
-bq = BQMail('xxx@xxx.com', server='smtp.xxx.com', password='xxxxxx', username='bqmail')
-bq.query_events(starttime=UTCDateTime(2003, 1, 1), endtime=UTCDateTime(2004, 12, 31),
-                minmagnitude=5.5, catalog='GCMT', latitude=40, longitude=118.3389, minradius=25, maxradius=95)
-bq.query_stations(network='ZX', station='2*')
-bq.send_mail(mark="P", time_before=-100, time_after=300, arrange='events', write_evtinfo=True)
+bq = BQMail('gomijianxu@163.com', server='smtp.163.com', password='UYBECNASZQWCDFNF', username='mijian')
+bq.query_events(starttime=UTCDateTime(2009, 6, 1), endtime=UTCDateTime(2019, 1, 1),
+                minmagnitude=5.8, catalog='GCMT', latitude=0, longitude=100, minradius=25, maxradius=95)
+bq.query_stations(network='MS', minlatitude=-6, maxlatitude=6.8, minlongitude=94, maxlongitude=107.4, channel='BH?', location='02')
+bq.send_mail(time_before=0, time_after=1000, arrange='events')

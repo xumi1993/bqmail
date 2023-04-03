@@ -1,5 +1,4 @@
 # BQMail
-[![Build Status](https://travis-ci.com/xumi1993/bqmail.svg?branch=master)](https://travis-ci.com/xumi1993/bqmail)
 [![PyPI](https://img.shields.io/pypi/v/bqmail)](https://pypi.org/project/bqmail/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/bqmail)]()
 [![PyPI - License](https://img.shields.io/pypi/l/bqmail)]()

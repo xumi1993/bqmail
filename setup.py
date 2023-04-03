@@ -5,7 +5,7 @@ packages = find_packages()
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-VERSION = "2.1.3"
+VERSION = "2.1.4"
 setup(name='bqmail',
       version=VERSION,
       author='Mijian Xu',
@@ -23,7 +23,7 @@ setup(name='bqmail',
       include_package_data=True,
       zip_safe=False,
       classifiers=['Programming Language :: Python',
-                   'Programming Language :: Python :: 3.8',
                    'Programming Language :: Python :: 3.9',
-                   'Programming Language :: Python :: 3.10']
+                   'Programming Language :: Python :: 3.10',
+                   'Programming Language :: Python :: 3.11']
       )

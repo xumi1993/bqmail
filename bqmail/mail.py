@@ -6,6 +6,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.header import Header 
 from .distaz import distaz
+import time
 model = TauPyModel()
 cld = Client()
 
@@ -62,6 +63,12 @@ def generatemsg(username, inst, mailname, media):
     return msg
 
 
+def check_succ(succ, label):
+    if succ:
+        print('successfully send {}'.format(label))
+    else:
+        print('Error in sending {}'.format(label))
+
 class BQMail():
     def __init__(self, mailname, username='bqmail',
                  inst='', media='Electronic (FTP)',
@@ -85,27 +92,47 @@ class BQMail():
         self.query.get_events(**kwargs)
 
     def send_mail(self, arrange='events', write_mail=False, write_evtinfo=False, **kwargs):
-        if arrange == 'events':
-            self.event_mail(**kwargs)
+        """Send mail to Breq_fase
+
+        :param arrange: Arrangement of earthquakes and stations, defaults to 'events'
+        :type arrange: str, optional
+        :param write_mail: write mail to ASCII file, defaults to False
+        :type write_mail: bool, optional
+        :param write_evtinfo: write event information to ASCII file. Only valid for stations and events, defaults to False
+        :type write_evtinfo: bool, optional
+        """
+        smtpobj = loginmail(
+            self.mailname,
+            server=self.server,
+            password=self.password
+        )
+        if arrange == 'stations':
+            self.station_mail(**kwargs)
+            succ = sendmail(smtpobj, self.mailname, self.msgs)
+            check_succ(succ, self.label)
         elif arrange == 'continue':
             if write_evtinfo:
                 raise ValueError('\'write_evtinfo\' can only be used when arrange=\'events\'')
             self.conti_mail(**kwargs)
+            succ = sendmail(smtpobj, self.mailname, self.msgs)
+            check_succ(succ, self.label)
+        elif arrange == 'events':
+            self.event_mail(**kwargs)
+            self.send_mail_loop(smtpobj)
         else:
             raise ValueError('variable arrange must be in \'events\' and \'continue\'')
-        smtpobj = loginmail(self.mailname, server=self.server,
-                            password=self.password)
-        succ = sendmail(smtpobj, self.mailname, self.msgs)
-        if succ:
-            print('successfully send {}'.format(self.label))
-        else:
-            print('Error in sending {}'.format(self.label))
         if write_mail:
             with open('msg.{}'.format(self.label), 'w') as f:
                 f.write(self.msgs)
         if write_evtinfo:
             with open('evtinfo.{}'.format(self.label), 'w') as f:
                 f.write(self.evtinfo)
+
+    def send_mail_loop(self, smtpobj):
+        for key, value in self.msgs.items():
+            succ = sendmail(smtpobj, key, value)
+            check_succ(succ, self.label[key])
+            time.sleep(4)
 
     def conti_mail(self, starttime=UTCDateTime(2000, 1, 1),
                    endtime=UTCDateTime.now(), time_val_in_hours=24,
@@ -123,6 +150,51 @@ class BQMail():
                                  edt.strftime('%Y %m %d %H %M %S'), channel, location)
 
     def event_mail(self, time_before=0, time_after=1000,
+                   mark='o', channel='BH?', location=''):
+        self.msgs = {}
+        self.label = {}
+        for _, evt in self.query.events.iterrows():
+            evt_date = evt['date'].strftime('%Y-%m-%dT%H:%M:%S')
+            self.msgs[evt_date] = self.header
+            self.label[evt_date] = 'Evts_{}'.format(evt_date)
+            self.msgs[evt_date] += '.LABEL {}\n.END\n'.format(self.label[evt_date])
+            self.msgs[evt_date] += '.HYPO ~{}~{:.4f}~{:.4f}~{:.1f}~0~0~{}\n'.format(
+                evt['date'].strftime('%Y %m %d %H %M %S.%f'),
+                evt['evla'],
+                evt['evlo'],
+                evt['region_name']
+            )
+            self.msgs[evt_date] += '.MAGNITUDE ~{:.1f}~{}~\n'.format(
+                evt['mag'],
+                evt['magtype']
+            )
+            for net in self.query.stations:
+                for sta in net:
+                    if mark != 'o':
+                        ttime = self.get_ttime(evt, sta, phase=mark)
+                        if ttime is None:
+                            continue
+                    else:
+                        ttime = 0
+                    b_time = evt['date'] + ttime + time_before
+                    e_time = evt['date'] + ttime + time_after
+                    self.evtinfo += '{} {} {} {} {:.3f} {:.3f} {:.3f} {:.1f} {}\n'.format(
+                        sta.code, net.code,
+                        b_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                        evt['date'].strftime('%Y-%m-%dT%H:%M:%S'),
+                        evt['evla'], evt['evlo'], evt['evdp'], evt['mag'],
+                        evt['magtype']
+                    )
+                    self.msgs[evt_date] += '{} {} {} {} 1 {} {}\n'.format(
+                        sta.code, 
+                        net.code,
+                        b_time.strftime('%Y %m %d %H %M %S.%f'),
+                        e_time.strftime('%Y %m %d %H %M %S.%f'),
+                        channel,
+                        location
+                    )
+
+    def station_mail(self, time_before=0, time_after=1000,
                    mark='o', channel='BH?', location=''):
         self.msgs = self.header
         self.label = 'Evts_{}'.format(UTCDateTime.now().strftime('%Y.%m.%dT%H%M%S'))

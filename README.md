@@ -1,5 +1,4 @@
 # BQMail
-[![Build Status](https://travis-ci.com/xumi1993/bqmail.svg?branch=master)](https://travis-ci.com/xumi1993/bqmail)
 [![PyPI](https://img.shields.io/pypi/v/bqmail)](https://pypi.org/project/bqmail/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/bqmail)]()
 [![PyPI - License](https://img.shields.io/pypi/l/bqmail)]()
@@ -12,7 +11,8 @@
 
 For **Chinese users**, please refer to our [chinese blog](https://blog.xumijian.me/tags/bqmail/).
 ## Installation
-**BQMail** can currently run on Linux and MAC OSX. **BQMail** is running and testing on Python 3.6/3.7/3.8.
+**BQMail** can currently run on Linux and MAC OSX. **BQMail** is running and testing on Python 3.9/3.10/3.11.
+
 ### Installation via PyPI
 ```
 pip install bqmail
